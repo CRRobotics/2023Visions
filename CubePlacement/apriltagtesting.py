@@ -1,8 +1,8 @@
 from pupil_apriltags import Detector
 import cv2 as cv
-
+import constants
 at_detector = Detector(
-   families="tag36h11",
+   families=constants.TAG_FAMILY,
    nthreads=1,
    quad_decimate=1.0,
    quad_sigma=0.0,
@@ -27,7 +27,7 @@ while True:
         for x, y in detection[0].corners:
 
             cv.circle(frame, (int(x), int(y)), 15, (255,0,0), -1)
-            
+
     else:
         print("NONE")
 
