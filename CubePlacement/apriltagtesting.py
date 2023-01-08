@@ -27,6 +27,7 @@ while True:
 
             cx, cy = detection.center
             cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
+            cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0))
 
     else:
         print("NONE")
