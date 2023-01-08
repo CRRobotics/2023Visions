@@ -6,20 +6,27 @@ from functions import *
 
 cap = cv.VideoCapture(0)
 
-
 while True:
     success, frame = cap.read()
 
+    #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
+    # frame = cv.imread(r"CubePlacement\diagrams\apriltagHeights.png")
+
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-    detection = getDetections(grayframe=gray)
+    detections:list[Detection] = getDetections(grayframe=gray)
 
 
-    if detection:
-        print(detection[0].tag_id)
-        for x, y in detection[0].corners:
+    if detections:
+        for detection in detections:
 
-            cv.circle(frame, (int(x), int(y)), 10, (255,0,0), -1)
+            if detection.tag_id not in [1,2,3,4,5,6]:
+                continue
+            for x, y in detection.corners:
+                cv.circle(frame, (int(x), int(y)), 5, (255,0,0), -1)
+
+            cx, cy = detection.center
+            cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
 
     else:
         print("NONE")
