@@ -10,7 +10,7 @@ while True:
     success, frame = cap.read()
 
     #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
-    # frame = cv.imread(r"CubePlacement\diagrams\apriltagHeights.png")
+    frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
 
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
