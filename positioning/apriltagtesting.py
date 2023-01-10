@@ -22,12 +22,17 @@ while True:
 
             if detection.tag_id not in [1,2,3,4,5,6]:
                 continue
+
+            corner_counter = 1
             for x, y in detection.corners:
-                cv.circle(frame, (int(x), int(y)), 5, (255,0,0), -1)
+                corner = (int(x), int(y))
+                cv.putText(frame, f"{corner_counter}", corner, cv.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0))
+                cv.circle(frame, corner, 5, (255,0,0), -1)
+                corner_counter += 1
 
             cx, cy = detection.center
             cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
-            cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0))
+            cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
     else:
         print("NONE")
