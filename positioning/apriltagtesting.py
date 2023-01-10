@@ -4,13 +4,13 @@ import constants
 from functions import *
 
 
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(1)
 
 while True:
     success, frame = cap.read()
 
     #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
-    frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
+    # frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
 
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 

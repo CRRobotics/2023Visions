@@ -7,7 +7,7 @@ import glob
 import json
  
 # Defining the dimensions of checkerboard ##THE 30 IS FOR LENGTH OF SMALL SQUARE
-CHECKERBOARD = (24,32)
+CHECKERBOARD = (7,5)
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
  
 # Creating vector to store vectors of 3D points for each checkerboard image
@@ -23,9 +23,12 @@ prev_img_shape = None
  
 # Extracting path of individual image stored in a given directory
 gray = 0
-images = glob.glob('positioning/checkerboardpics/*.jpg')
-for fname in images:
-    img = cv2.imread(fname)
+
+cap:cv2.VideoCapture = cv2.VideoCapture(1)
+counter = 0
+while counter < 26:
+
+    success, img = cap.read()
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     # Find the chess board corners
     # If desired number of corners are found in the image then ret = true
@@ -47,9 +50,10 @@ for fname in images:
  
         # Draw and display the corners
         img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
+        counter +=1
     else:
         print("NO CHESSBOARD")
-        
+
     cv2.imshow('img',img)
     cv2.waitKey(0)
  
@@ -75,8 +79,9 @@ print(tvecs)
 
 
 
+
 ##Save the params to json.
-with open('cameraconstants.json') as f:
+with open('positioning\cameraconstants.json') as f:
     data = json.load(f)
     data["matrix"] = cmtx
     data["distortion"] = distortion
