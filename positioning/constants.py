@@ -1,4 +1,6 @@
 from pupil_apriltags import *
+import json
+import numpy as np
 
 
 
@@ -14,3 +16,11 @@ DETECTOR = Detector(
     decode_sharpening=0.25,
     debug=0
     )
+
+
+
+with open("positioning\cameraconstants.json") as f:
+    data = json.load(f)
+    CAMERA_MATRIX = np.array(data["matrix"])
+    CAMERA_DIST = np.array(data["distortion"])
+

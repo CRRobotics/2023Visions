@@ -2,6 +2,7 @@ from pupil_apriltags import Detector
 import cv2 as cv
 import constants
 from functions import *
+import numpy as np
 
 
 cap = cv.VideoCapture(1)
@@ -20,7 +21,7 @@ while True:
     if detections:
         for detection in detections:
 
-            if detection.tag_id not in [1,2,3,4,5,6]:
+            if detection.tag_id not in [1,2,3,4,5,6] and len(detection.corners) >= 4:
                 continue
 
             corner_counter = 1
@@ -33,6 +34,16 @@ while True:
             cx, cy = detection.center
             cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
             cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
+
+
+            cv.solvePnP(
+                np.array([(0,0, 0), (6, 0, 0), (6, 6, 0), (0, 6, 0)]), 
+                detection.corners, 
+                constants.CAMERA_MATRIX,
+                constants.CAMERA_DIST, 
+                )
+
+
 
     else:
         print("NONE")
