@@ -21,7 +21,7 @@ while True:
     if detections:
         for detection in detections:
 
-            if detection.tag_id not in [1,2,3,4,5,6] and len(detection.corners) >= 4:
+            if detection.tag_id not in [1,2,3,4,5,6,7,8] and len(detection.corners) >= 4:
                 continue
 
             corner_counter = 1
@@ -51,14 +51,12 @@ while True:
                 constants.CAMERA_DIST, 
                 )
 
+            print(tvec, rvec)
+
 
 
     else:
         print("NONE")
-
-
-
-
     cv.imshow("IMAGE", frame)
 
 
