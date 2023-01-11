@@ -35,9 +35,17 @@ while True:
             cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
             cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
+            objectpoints = []
 
-            cv.solvePnP(
-                np.array([(0,0, 0), (6, 0, 0), (6, 6, 0), (0, 6, 0)]), 
+            objectpoints.append((-0.0762, 0.0762, 0.0))
+            objectpoints.append((0.0762, 0.0762, 0.0))
+            objectpoints.append((0.0762, -0.0762, 0.0))
+            objectpoints.append((-0.0762, -0.0762, 0.0))
+
+
+
+            mmat, tvec, rvec = cv.solvePnP(
+                np.array(objectpoints), 
                 detection.corners, 
                 constants.CAMERA_MATRIX,
                 constants.CAMERA_DIST, 
