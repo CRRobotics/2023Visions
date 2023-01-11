@@ -3,7 +3,7 @@ import cv2 as cv
 import constants
 from functions import *
 import numpy as np
-
+print("We out")
 
 cap = cv.VideoCapture(1)
 
@@ -11,7 +11,7 @@ while True:
     success, frame = cap.read()
 
     #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
-    # frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
+    frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
 
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
@@ -21,7 +21,7 @@ while True:
     if detections:
         for detection in detections:
 
-            if detection.tag_id not in [1,2,3,4,5,6,7,8] and len(detection.corners) >= 4:
+            if detection.tag_id not in [1,2,3,4,5,6,7,8] and len(detection.corners) != 4:
                 continue
 
             corner_counter = 1
@@ -42,14 +42,19 @@ while True:
             objectpoints.append((0.0762, -0.0762, 0.0))
             objectpoints.append((-0.0762, -0.0762, 0.0))
 
+            objectpoints = np.array(objectpoints)
+
 
 
             mmat, tvec, rvec = cv.solvePnP(
-                np.array(objectpoints), 
+                objectpoints, 
                 detection.corners, 
                 constants.CAMERA_MATRIX,
                 constants.CAMERA_DIST, 
                 )
+            imgpts, jac = cv.projectPoints(objectpoints, rvec, tvec, constants.CAMERA_MATRIX, constants.CAMERA_DIST)
+
+            frame = draw(frame, detection.corners, imgpts)
 
             print(tvec, rvec)
 
