@@ -9,7 +9,7 @@ cap  = cv.VideoCapture(0)
 while True:
     success, frame = cap.read()
 
-    frame = cv.imread(r"ConePlacement\sample_images\Straight__Left_187in.png")
+    frame = cv.imread(r"C:\Users\labra\Coding Practice\testing playgroung\Test_AprilTag_0.jpg")
 
     blurred = blur(frame)
     mask = filter_retro(blurred)
