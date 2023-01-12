@@ -2,14 +2,14 @@
 
 
 
-from pupil_apriltags import *
+from apriltag import *
 import cv2 as cv
 import numpy as np
 import constants
 
 
 
-def getDetections(grayframe) -> Detection:
+def getDetections(grayframe):
     return constants.DETECTOR.detect(grayframe)
 
 
@@ -30,7 +30,7 @@ def draw(img, corners, imgpts):
 
 
 def getVecs(frame, cmtx, dist):
-    detections:list[Detection] = getDetections(grayframe=frame)
+    detections = getDetections(grayframe=frame)
 
     toreturn = {
         "tvecs":[],
