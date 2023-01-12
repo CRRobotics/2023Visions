@@ -21,8 +21,10 @@ DETECTOR = Detector(
 
 with open("positioning/cameraconstants.json") as f:
     data = json.load(f)
-    CAMERA_MATRIX = np.array(data["matrix"])
-    CAMERA_DIST = np.array(data["distortion"])
+    CAMERA_MATRIX1 = np.array(data["cam1"]["matrix"])
+    CAMERA_DIST1 = np.array(data["cam1"]["distortion"])
+    CAMERA_MATRIX2 = np.array(data["cam2"]["matrix"])
+    CAMERA_DIST2 = np.array(data["cam2"]["distortion"])
 
 
 

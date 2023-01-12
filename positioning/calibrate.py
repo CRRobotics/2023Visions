@@ -24,7 +24,7 @@ prev_img_shape = None
 # Extracting path of individual image stored in a given directory
 gray = 0
 
-cap:cv2.VideoCapture = cv2.VideoCapture(1)
+cap:cv2.VideoCapture = cv2.VideoCapture(0)
 counter = 0
 while counter < 26:
 
