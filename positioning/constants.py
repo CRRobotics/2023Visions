@@ -23,15 +23,16 @@ with open("positioning/cameraconstants.json") as f:
 ID_POS = {
     #Coordinates taken from field cad
     1:{
-        # "center":(-7.243, 2.9365, 0.463),
-        "center":(1, 0, 0),
+        "center":(-7.243, 2.9365, 0.463),
     },
     2:{
         # "center":(-7.243, 1.26, 0.463),   
         "center":(0, 0, 0),
     },
     3:{
-        "center":(-7.243, -0.416, 0.463),   
+        # "center":(-7.243, -0.416, 0.463),   
+        "center":(1, 0, 0),
+
     },
     4:{
         "center":(-7.908, -2.7415, 0.6955),   

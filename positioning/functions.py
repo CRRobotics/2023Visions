@@ -50,9 +50,10 @@ def getVecs(frame, cmtx, dist, detector):
     }
 
     if detections:
-        euclideanCoords = []
-        for detection in detections:
+        objectpoints = []
+        cornerpoints = []
 
+        for detection in detections:
             if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4:
                 
                 corner_counter = 1
@@ -66,60 +67,51 @@ def getVecs(frame, cmtx, dist, detector):
                 cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
                 cv.putText(frame, "id: %s"%(detection["id"]), (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
-                objectpoints = []
 
                 for coord in constants.GET_CORNERS_MAT:
                     objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
 
+                for corner in detection["lb-rb-rt-lt"]:
+                    cornerpoints.append(corner)
 
-                objectpoints = np.array(objectpoints)
+        if objectpoints and cornerpoints:
 
+            objectpoints = np.array(objectpoints)
+            cornerpoints = np.array(cornerpoints)
 
+            # print("objectpoints:")
+            # print(objectpoints)
+            # print("cornerpoints:")       
+            # print(cornerpoints)
+            mmat, rvec, tvec = cv.solvePnP(
+                objectpoints, 
+                cornerpoints,
+                cmtx,
+                dist,  
+                )
 
-                mmat, rvec, tvec = cv.solvePnP(
-                    objectpoints, 
-                    detection["lb-rb-rt-lt"], 
-                    cmtx,
-                    dist,  
-                    )
-                # imgpts, jac = cv.projectPoints(objectpoints, rvec, tvec, constants.CAMERA_MATRIX, constants.CAMERA_DIST)
+            tvec = (np.array(tvec))
+            rvec = (np.array(rvec))   
 
-                # frame = draw(frame, detection.corners, imgpts)
-                tvec = (np.array(tvec))
-                rvec = (np.array(rvec))   
+            toreturn["tvecs"] = tvec
+            toreturn["rvecs"] = rvec
 
-                print(tvec)
-                print(rvec)  
+            rotationmatrix, _ = cv.Rodrigues(rvec)
 
-                toreturn["tvecs"] = tvec
-                toreturn["rvecs"] = rvec
+            final_coords = np.dot(-rotationmatrix.T, tvec)
 
-                x, y, z = tvec
-                euclideanCoords.append((x, y,))
+            p = np.hstack((rotationmatrix, tvec))
 
-                rx, ry, rz = rvec
+            euler_angles_r = -cv.decomposeProjectionMatrix(p)[6]
 
-                w, h, _ = frame.shape
+            ax, ay, az = euler_angles_r
 
-
-                rotationmatrix, _ = cv.Rodrigues(rvec)
-                print(rotationmatrix)
-                # print(toreturn)
-
-                final_coords = np.dot(-rotationmatrix.T, tvec)
-
-                p = np.hstack((rotationmatrix, tvec))
-
-                euler_angles_r = -cv.decomposeProjectionMatrix(p)[6]
-
-                ax, ay, az = euler_angles_r
+            px, py, pz = final_coords
 
 
 
-                px, py, pz = final_coords
-
-                cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-                cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
 
 
     return toreturn

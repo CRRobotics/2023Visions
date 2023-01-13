@@ -7,7 +7,7 @@ print("We out")
 
 
 
-def process(cameraid:int):
+def process_frame(cameraid:int, cammat, distco):
     cap = cv.VideoCapture(cameraid)
     detector = getDetector()
 
@@ -17,17 +17,17 @@ def process(cameraid:int):
         #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
         # frame = cv.imread(r"ConePlacement/sample_images/Straight__Left_187in.png")
 
-        vecsdict = getVecs(frame1, constants.CAMERA_MATRIX1, constants.CAMERA_DIST1, detector)
+        vecsdict = getVecs(frame1, cammat, distco, detector)
         cv.imshow(f"CAMID{cameraid}:", frame1)
-        print(f"CAMERAID: {cameraid}")
-        print(vecsdict)
+        # print(f"CAMERAID: {cameraid}")
+        # print(vecsdict)
         cv.waitKey(1)
 
 if __name__ == "__main__":
-    t1 = threading.Thread(target=process, args=[0])
-    # t2 = threading.Thread(target=process, args=[2])
+    t1 = threading.Thread(target=process_frame, args=[0, constants.CAMERA_MATRIX1, constants.CAMERA_DIST1])
+    t2 = threading.Thread(target=process_frame, args=[2, constants.CAMERA_MATRIX2, constants.CAMERA_DIST2])
     t1.start()
-    # t2.start()
+    t2.start()
     t1.join()
-    # t2.join()
+    t2.join()
     print("Done!")
