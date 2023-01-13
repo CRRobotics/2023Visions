@@ -7,15 +7,7 @@ import numpy as np
 TAG_FAMILY = "tag16h5"
 
 
-DETECTOR = Detector(
-    families=TAG_FAMILY,
-    nthreads=1,
-    quad_decimate=1.0,
-    quad_sigma=0.0,
-    refine_edges=1,
-    decode_sharpening=0.25,
-    debug=0
-    )
+
 
 
 
@@ -32,10 +24,11 @@ ID_POS = {
     #Coordinates taken from field cad
     1:{
         # "center":(-7.243, 2.9365, 0.463),
-        "center":(0, 0, 0),
+        "center":(1, 0, 0),
     },
     2:{
-        "center":(-7.243, 1.26, 0.463),   
+        # "center":(-7.243, 1.26, 0.463),   
+        "center":(0, 0, 0),
     },
     3:{
         "center":(-7.243, -0.416, 0.463),   
