@@ -106,7 +106,7 @@ def getVecs(frame, cmtx, dist, detector):
                 print(rotationmatrix)
                 # print(toreturn)
 
-                final_coords = np.dot(rotationmatrix.T, tvec)
+                final_coords = np.dot(-rotationmatrix.T, tvec)
 
                 px, py, pz = final_coords
 
