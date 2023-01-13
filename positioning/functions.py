@@ -108,13 +108,18 @@ def getVecs(frame, cmtx, dist, detector):
 
                 final_coords = np.dot(-rotationmatrix.T, tvec)
 
+                p = np.hstack((rotationmatrix, tvec))
+
+                euler_angles_r = -cv.decomposeProjectionMatrix(p)[6]
+
+                ax, ay, az = euler_angles_r
+
+
+
                 px, py, pz = final_coords
 
-
-                cv.putText(frame, "TX: %.4f TY: %.4f TZ: %.4f"%(x, y, z), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-                cv.putText(frame, "RX: %.4f RY: %.4f RZ: %.4f"%(rx, ry, rz), (50, 70), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
                 cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-
+                cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
 
 
     return toreturn
