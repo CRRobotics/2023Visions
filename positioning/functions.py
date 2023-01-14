@@ -6,17 +6,36 @@ from apriltag import apriltag
 import cv2 as cv
 import numpy as np
 import constants
+from networktables import NetworkTables as nt
+import threading
+
+def networkConnect() -> any:
+    cond = threading.Condition()
+    notified = [False]
+
+    def connectionListener(connected, info):
+        print(info, '; Connected=%s' % connected)
+        with cond:
+            notified[0] = True
+            cond.notify()
+
+    nt.initialize(server=constants.SERVER)
+    nt.addConnectionListener(connectionListener, immediateNotify=True)
+
+    with cond:
+        print("Waiting")
+        if not notified[0]:
+            cond.wait()
+    return nt
+
+
+def pushval(networkinstance, tablename:str, valuename, value:float):
+    table = networkinstance.getTable(tablename)
+    table.putNumber(valuename, value)
+
+    
 
 def getDetector():
-    # return apriltag(
-    # families=constants.TAG_FAMILY,
-    # nthreads=1,
-    # quad_decimate=1.0,
-    # quad_sigma=0.0,
-    # refine_edges=1,
-    # decode_sharpening=0.25,
-    # debug=0
-    # )
     return apriltag( constants.TAG_FAMILY)
 
 
@@ -93,9 +112,6 @@ def getVecs(frame, cmtx, dist, detector):
             tvec = (np.array(tvec))
             rvec = (np.array(rvec))   
 
-            toreturn["tvecs"] = tvec
-            toreturn["rvecs"] = rvec
-
             rotationmatrix, _ = cv.Rodrigues(rvec)
 
             final_coords = np.dot(-rotationmatrix.T, tvec)
@@ -108,12 +124,12 @@ def getVecs(frame, cmtx, dist, detector):
 
             px, py, pz = final_coords
 
+            toreturn["pos"] = final_coords
+            toreturn["angle"] = euler_angles_r
+
 
 
             cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-
-
-    return toreturn
-
+            return toreturn
 
