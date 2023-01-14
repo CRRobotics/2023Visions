@@ -71,6 +71,7 @@ def getVecs(frame, cmtx, dist, detector):
     if detections:
         objectpoints = []
         cornerpoints = []
+        tagcounter = 0
 
         for detection in detections:
             if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4:
@@ -83,6 +84,7 @@ def getVecs(frame, cmtx, dist, detector):
                     corner_counter += 1
 
                 cx, cy = detection["center"]
+                tagcounter += 1
                 cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
                 cv.putText(frame, "id: %s"%(detection["id"]), (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
@@ -126,10 +128,23 @@ def getVecs(frame, cmtx, dist, detector):
 
             toreturn["pos"] = final_coords
             toreturn["angle"] = euler_angles_r
-
+            toreturn["tags"] = tagcounter
 
 
             cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             return toreturn
 
+def mergeCams(vecsdicts):
+    pos1 = vecsdicts[0]["pos"]
+    pos2 = vecsdicts[2]["pos"]
+    rot1 = vecsdicts[0]["angle"]
+    rot2 = vecsdicts[2]["angle"]
+    tags1 = vecsdicts[0]["tags"]
+    tags2 = vecsdicts[2]["tags"]
+    w1, w2 = 1, 1
+    if tags1 >= tags2: w1 = tags1/tags2
+    else: w2 = tags2/tags1
+    finalpos = (pos1 * w1 + pos2 * w2)/(w1 + w2)
+    finalrot = (rot1 * w1 + rot2 * w2)/(w1 + w2)
+    return finalpos, finalrot
