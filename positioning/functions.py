@@ -8,6 +8,7 @@ import numpy as np
 import constants
 from networktables import NetworkTables as nt
 import threading
+import math
 
 def networkConnect() -> any:
     cond = threading.Condition()
@@ -60,7 +61,7 @@ def draw(img, corners, imgpts):
 
 
 
-def getVecs(frame, cmtx, dist, detector):
+def getVecs(frame, cmtx, dist, detector, cameraid):
     detections = getDetections(detector,frame)
 
     toreturn = {
@@ -125,26 +126,68 @@ def getVecs(frame, cmtx, dist, detector):
             ax, ay, az = euler_angles_r
 
             px, py, pz = final_coords
+            robocoords, robotheta = getRobotVals(ay, cameraid, px, pz)
 
-            toreturn["pos"] = final_coords
-            toreturn["angle"] = euler_angles_r
+            toreturn["pos"] = robocoords
+
+            rx, ry, _ = robocoords
+
+            toreturn["angle"] = robotheta
             toreturn["tags"] = tagcounter
 
 
             cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "RX: %.4f RY: %.4f RTHETA: %.4f"%(rx, ry, robotheta), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+
             return toreturn
 
 def mergeCams(vecsdicts):
+    # Get positions, rotations, and number of tags each one sees
     pos1 = vecsdicts[0]["pos"]
     pos2 = vecsdicts[2]["pos"]
     rot1 = vecsdicts[0]["angle"]
     rot2 = vecsdicts[2]["angle"]
     tags1 = vecsdicts[0]["tags"]
     tags2 = vecsdicts[2]["tags"]
-    w1, w2 = 1, 1
-    if tags1 >= tags2: w1 = tags1/tags2
-    else: w2 = tags2/tags1
-    finalpos = (pos1 * w1 + pos2 * w2)/(w1 + w2)
-    finalrot = (rot1 * w1 + rot2 * w2)/(w1 + w2)
+    w = tags1/tags2 #Weight based on number of tags each one sees
+    #Weighted average based on number of cameras
+    finalpos = (pos1 * w + pos2)/(w + 1)
+    finalrot = (rot1 * w + rot2)/(w + 1)
     return finalpos, finalrot
+
+
+
+
+def getRobotVals(ay, cameraid, px, py):
+    #print("ay %s, px, %s, py%s"%(ay, px, py))
+    robotheta = math.radians(ay - constants.CAMERA_CONSTANTS[cameraid]["thetar"])
+    xr =-constants.CAMERA_CONSTANTS[cameraid]["xc"]
+    yr = -constants.CAMERA_CONSTANTS[cameraid]["yc"]
+
+    #print("THETA:", robotheta)
+
+    transformationmatrix = np.array(
+        [
+            [math.cos(math.radians(ay)), -math.sin(math.radians(ay)), px],
+            [math.sin(math.radians(ay)), math.cos(math.radians(ay)), py],
+            [0, 0, 1]
+        ],
+        dtype=object
+    )
+
+    #print("TRANSFORMATIOMATRIX:", transformationmatrix)
+
+    robotcoordsRelativetocam = np.array(
+        [
+            [xr],
+            [yr],
+            [1]
+        ],
+        dtype=object
+    )
+    #print("robotcoordsRelativeToCam:", robotcoordsRelativetocam)
+
+    robocoords = np.dot(transformationmatrix, robotcoordsRelativetocam)
+
+    return robocoords, robotheta
