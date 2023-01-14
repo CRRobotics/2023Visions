@@ -2,35 +2,48 @@ import cv2
 import numpy as np
 import math
 
-def getCenters(img, contours):
-    """_, contours, _ = cv2.findContours
-    returns centers of all polygons"""
-    centers = []
-    for i in range(len(contours)):
-        moments = cv2.moments(contours[i])
-        centers.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-        cv2.circle(img, centers[-1], 3, (0, 0, 255), -1)
-    return centers
-
-def filtercontours(contours):
-    retained = []
-    for i in range(len(contours)):
-        x,y,w,h=cv2.boundingRect(contours[i])
-        countourArea=cv2.contourArea(contours[i])
-        ratio=countourArea/(w*h)
-        
-        if not (ratio >=0.6 or ratio <= 0.4 or countourArea <= 100):
-            retained.append(contours[i])
-
-    return retained
 
 
+def maskGenerator(img,lower_color,higher_color):
+    mask=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    mask=cv2.blur(mask,(5,5))
+    mask=cv2.inRange(mask,lower_color,higher_color)    
+    kernel=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
+    mask=cv2.erode(mask,kernel,iterations=10)
+    mask=cv2.dilate(mask,kernel,iterations=10)                                                                                                                                                                                                                                                                                                                                                            
+    return mask
 
-def binarizeSubt(img):
-    blue, green, red = cv2.split(img)
-    yellow=cv2.subtract(green,blue)
-    ret,binImage = cv2.threshold(yellow, 40, 255, cv2.THRESH_BINARY)
-    return binImage
+
+def convexHull(contours):
+    ConvexHull=[cv2.convexHull(contour) for contour in contours]
+    return ConvexHull
+
+
+def filter_out_contours_that_doesnot_look_like_square(contours):
+    filteredContours=[]
+    for contour in contours:
+        x,y,w,h=cv2.boundingRect(contour)
+        m=w/h#show how perfect the square i
+        if m <1.3 and m >=1 :  
+            filteredContours.append(contour)
+    return filteredContours
+
+
+def find_biggest_contour(contours):
+    sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
+    if len(sortedContours)>0:
+        biggest_contour=sortedContours[-1]
+        return biggest_contour
+    
+    
+def find_and_draw_center_of_target(frame,biggest_contour): 
+    x,y,w,h=cv2.boundingRect(biggest_contour)
+    cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
+    moments = cv2.moments(biggest_contour)
+    center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
+    cv2.circle(frame, center, 3, (0, 0, 255), -1)
+    return center
+
 
 class Line:
 
