@@ -30,32 +30,27 @@ def process_frame(cameraid:int, nt):
             print("failed to get image")
             continue
 
-        #UNCOMMENT THIS IF YOU WANT TO TEST ON AN IMG
-        # frame = cv.imread(r"ConePlacement/sample_images/Straight__Left_187in.png")
-
         vecsdict = getVecs(frame1, cammat, distco, detector, cameraid)
 
         if vecsdict:
-            # print(vecsdict["pos"])
-            anglez = vecsdict["angle"]
-            px, py, _ = vecsdict["pos"]
-            # print(cameraid, ": ", "\nCoords: ", (px, py), "\nAngle: ", anglez)
-            #pushval(nt, "Position", "Robotheta", robotheta)
+            robotheta = vecsdict["angle"]
+            rx, ry, _ = vecsdict["pos"]
+            pushval(nt, f"{cameraid}", "Robotheta", robotheta)
+            pushval(nt, f"{cameraid}", "rx",rx )
+            pushval(nt, f"{cameraid}", "ry", ry)
 
-            globalvecsdict[cameraid] = {
-                "gx": px[0][0],
-                "gy": py[0][0],
-                "theta":anglez
-            }
+            # globalvecsdict[cameraid] = {
+            #     "gx": px[0][0],
+            #     "gy": py[0][0],
+            #     "theta":robotheta
+            # }
 
-        if globalvecsdict[0] and globalvecsdict[2]:
-            ...
-            # pos, rot = mergeCams(globalvecsdict)
-            # print("Pos: ", pos, "\nRot: ", rot)
+        # if globalvecsdict[0] and globalvecsdict[2]:
+        #     ...
+        #     pos, rot = mergeCams(globalvecsdict)
+        #     print("Pos: ", pos, "\nRot: ", rot)
         print(globalvecsdict)
         cv.imshow(f"CAMID{cameraid}:", frame1)
-        # print(f"CAMERAID: {cameraid}")
-        # print(vecsdict)
         cv.waitKey(1)
         ts = time()
 
