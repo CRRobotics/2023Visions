@@ -126,7 +126,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             ax, ay, az = euler_angles_r
 
             px, py, pz = final_coords
-            robocoords, robotheta = getRobotVals(ay, cameraid, px, pz)
+            robocoords, robotheta = getRobotVals(ay, cameraid, pz, px)
 
             toreturn["pos"] = robocoords
 
@@ -136,8 +136,8 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             toreturn["tags"] = tagcounter
 
 
-            cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-            cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(pz, px, py), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(az, ax, ay), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             cv.putText(frame, "RX: %.4f RY: %.4f RTHETA: %.4f"%(rx, ry, robotheta), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
 
             return toreturn
@@ -162,8 +162,8 @@ def mergeCams(vecsdicts):
 def getRobotVals(ay, cameraid, px, py):
     #print("ay %s, px, %s, py%s"%(ay, px, py))
     robotheta = math.radians(ay - constants.CAMERA_CONSTANTS[cameraid]["thetar"])
-    xr =-constants.CAMERA_CONSTANTS[cameraid]["xc"]
-    yr = -constants.CAMERA_CONSTANTS[cameraid]["yc"]
+    xr = constants.CAMERA_CONSTANTS[cameraid]["xc"]
+    yr = constants.CAMERA_CONSTANTS[cameraid]["yc"]
 
     #print("THETA:", robotheta)
 
