@@ -38,7 +38,7 @@ def process_frame(cameraid:int, nt):
             pushval(nt, f"{cameraid}", "Robotheta", robotheta)
             pushval(nt, f"{cameraid}", "rx",rx )
             pushval(nt, f"{cameraid}", "ry", ry)
-
+            pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
             # globalvecsdict[cameraid] = {
             #     "gx": px[0][0],
             #     "gy": py[0][0],
