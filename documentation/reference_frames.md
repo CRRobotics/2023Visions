@@ -1,0 +1,78 @@
+We are given the global position, and angle to two different cameras, $C_0$, and $C_2$
+
+
+## Robot Position
+With these reference frames, 
+$$
+\begin{bmatrix}  
+x_r\\  
+y_r\\
+1
+\end{bmatrix}_{C_2}
+=
+\begin{bmatrix}
+.05 + .09 \cos22.5\degree \\
+.09 \cos22.5\degree \\
+1
+\end{bmatrix}
+$$
+$$
+\begin{bmatrix}  
+x_r\\  
+y_r\\
+1
+\end{bmatrix}_{C_0}
+=
+\begin{bmatrix}
+.05 + .09 \cos22.5\degree \\
+-.09 \cos22.5\degree \\
+1
+\end{bmatrix}
+$$
+To get the global coordinates of the robot, we can use:
+$$
+\begin{bmatrix}  
+x_r\\  
+y_r\\
+1
+\end{bmatrix}_{G}
+=
+\begin{bmatrix}
+\cos \theta_c & -\sin\theta_c & x_c\\
+\sin \theta_c & \cos\theta_c & y_c\\
+0 & 0 & 1\\
+\end{bmatrix}_G \cdot
+\begin{bmatrix}
+x_r\\
+y_r\\
+1
+\end{bmatrix}_C
+$$
+For example, for Camera 0, it woult look like:
+$$
+\begin{bmatrix}  
+x_r\\  
+y_r\\
+1
+\end{bmatrix}_{G}
+=
+\begin{bmatrix}
+\cos \theta_c & -\sin\theta_c & x_c\\
+\sin \theta_c & \cos\theta_c & y_c\\
+0 & 0 & 1\\
+\end{bmatrix}_G \cdot
+\begin{bmatrix}
+.05 + .09 \cos22.5\degree \\
+-.09 \cos22.5\degree \\
+1
+\end{bmatrix}
+$$
+## Robot angle
+By definition,
+$$\theta_{rg} = \theta_{cg} - \theta_{cr}$$
+When aligned, $\theta_{rg} = 0$ . Turning to the left, is also interpreted as a negative rotation by solvepnp. therefore, when we are aligned, $C_2$ has a negative angle of -22.5 degrees. This means,
+$$0 = -22.5\degree - \theta_{C_2r}$$
+$$-22.5\degree = \theta_{C_2r}$$
+Similarly, for $C_0$ , when we are aligned, solvepnp calculates  a positive angle for $C_0$ :
+$$0 = 22.5\degree - \theta_{C_0r}$$
+$$22.5\degree = \theta_{C_0r}$$
