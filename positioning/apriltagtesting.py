@@ -11,7 +11,7 @@ print("We out")
 def process_frame(cameraid:int, nt):
     cap = cv.VideoCapture(cameraid)
     detector = getDetector()
-    global globalvecsdict
+    # global globalvecsdict
 
     cammat = constants.CAMERA_CONSTANTS[cameraid]["matrix"]
     distco = constants.CAMERA_CONSTANTS[cameraid]["distortion"]
@@ -49,7 +49,7 @@ def process_frame(cameraid:int, nt):
         #     ...
         #     pos, rot = mergeCams(globalvecsdict)
         #     print("Pos: ", pos, "\nRot: ", rot)
-        print(globalvecsdict)
+        # print(globalvecsdict)
         cv.imshow(f"CAMID{cameraid}:", frame1)
         cv.waitKey(1)
         ts = time()
