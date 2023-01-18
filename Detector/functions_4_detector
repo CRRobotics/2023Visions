@@ -1,0 +1,54 @@
+import cv2
+import numpy as np
+
+
+def maskGenerator(img,lower_color,higher_color):
+   
+    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    img=cv2.blur(img, (5,5)) 
+    mask=cv2.inRange(img,lower_color,higher_color)    
+    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    kernel2=cv2.getStructuringElement(cv2.MORPH_RECT,(15,15))
+    mask=cv2.erode(mask,kernel1,iterations=5)
+    mask=cv2.dilate(mask,kernel2,iterations=3)        
+                                                                                                                                                                                                                                                                                                                                                        
+    return mask
+
+
+def convexHull(mask):
+    contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    ConvexHull=[cv2.convexHull(contour) for contour in contours]
+    return ConvexHull
+  
+
+
+def filter_out_contours_that_doesnot_look_like_square(contours):  
+    filteredContours=[]
+    for contour in contours:
+        x,y,w,h=cv2.boundingRect(contour)
+        m=w/h#show how perfect the square i
+        if m <2 and m >=0.5 :
+            
+            filteredContours.append(contour)
+    return filteredContours
+
+def find_biggest_contour(contours):
+    
+    sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
+    
+    biggest_contour=sortedContours[0]
+    return biggest_contour
+
+    
+def find_and_draw_center_of_target(frame,biggest_contour):
+    x,y,w,h=cv2.boundingRect(biggest_contour)
+    cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
+    moments = cv2.moments(biggest_contour)
+    if moments['m00'] !=0:
+        center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
+        cv2.circle(frame, center, 3, (0, 0, 255), -1)
+        return center
+def putCenterPixelIn(frame):
+    h, w, c = frame.shape
+    centerPixel = (int(w / 2), int(h / 2))
+    cv2.circle(frame, centerPixel, 3, (255, 0, 255), -1)
