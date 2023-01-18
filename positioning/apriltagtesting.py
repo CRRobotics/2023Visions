@@ -15,7 +15,7 @@ def process_frame(cameraid:int, nt):
 
     cammat = constants.CAMERA_CONSTANTS[cameraid]["matrix"]
     distco = constants.CAMERA_CONSTANTS[cameraid]["distortion"]
-    ts = 0
+    # ts = 0
 
     while cap.isOpened():
         # delta = time() - ts
@@ -35,10 +35,11 @@ def process_frame(cameraid:int, nt):
         if vecsdict:
             robotheta = vecsdict["angle"]
             rx, ry, _ = vecsdict["pos"]
-            pushval(nt, f"{cameraid}", "Robotheta", robotheta)
-            pushval(nt, f"{cameraid}", "rx",rx )
-            pushval(nt, f"{cameraid}", "ry", ry)
-            pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
+            # pushval(nt, f"{cameraid}", "Robotheta", robotheta)
+            # pushval(nt, f"{cameraid}", "rx",rx )
+            # pushval(nt, f"{cameraid}", "ry", ry)
+            # pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
+            
             # globalvecsdict[cameraid] = {
             #     "gx": px[0][0],
             #     "gy": py[0][0],
@@ -64,7 +65,7 @@ if __name__ == "__main__":
     t1 = threading.Thread(target=process_frame, args=[0,nt])
     t2 = threading.Thread(target=process_frame, args=[2,nt])
     t1.start()
-    t2.start()
+    # t2.start()
     t1.join()
-    t2.join()
+    # t2.join()
     print("Done!")

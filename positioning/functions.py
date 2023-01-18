@@ -90,8 +90,12 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
                 cv.putText(frame, "id: %s"%(detection["id"]), (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
 
-                for coord in constants.GET_CORNERS_MAT:
-                    objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
+                if detection["id"] in [8]:
+                    for coord in constants.GET_CORNERS_MAT_OTHER_WAY:
+                        objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
+                else:
+                    for coord in constants.GET_CORNERS_MAT:
+                        objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
 
                 for corner in detection["lb-rb-rt-lt"]:
                     cornerpoints.append(corner)
@@ -126,6 +130,9 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             ax, ay, az = euler_angles_r
 
             px, py, pz = final_coords
+
+
+
             robocoords, robotheta = getRobotVals(ay, cameraid, pz, px)
 
             toreturn["pos"] = robocoords
@@ -136,8 +143,8 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             toreturn["tags"] = tagcounter
 
 
-            cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(pz, px, py), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-            cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(az, ax, ay), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "PX: %.4f PY: %.4f PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+            cv.putText(frame, "AX: %.4f AY: %.4f AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
             cv.putText(frame, "RX: %.4f RY: %.4f RTHETA: %.4f"%(rx, ry, robotheta), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
 
             return toreturn
