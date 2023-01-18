@@ -13,7 +13,7 @@ while(vid.isOpened()):
     if len(contours1) >0:
         biggest_contour1=f.find_biggest_contour(contours1)
         center1=f.find_and_draw_center_of_target(frame,biggest_contour1)
-        mask1=f.maskGenerator(frame,constants.lower_purple,constants.higher_purple)
+       
     'CONE'
     mask2=f.maskGenerator(frame,constants.lower_yellow,constants.higher_yellow)
     contours2=f.convexHull(frame)    
