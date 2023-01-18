@@ -2,12 +2,14 @@
 import cv2 
 import numpy as np
 import functions as f
-import constants
+
 vid = cv2.VideoCapture(0)
 while(vid.isOpened()):    
     ret, frame = vid.read()  
     if ret == True:
-        mask=f.maskGenerator(frame,constants.lower_purple,constants.higher_purple)
+        lower_purple=np.array([106,80,0])
+        higher_purple=np.array([166,220,255])
+        mask=f.maskGenerator(frame,lower_purple,higher_purple)
         contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         contours=f.convexHull(contours)    
         contours=f.filter_out_contours_that_doesnot_look_like_square(contours)

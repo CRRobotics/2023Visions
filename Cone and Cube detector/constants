@@ -10,3 +10,5 @@ lower_yellow=np.array([2,89,0])
 higher_yellow=np.array([36,255,255])
 lower_purple=np.array([106,80,0])
 higher_purple=np.array([166,220,255])
+def op():
+    pass
