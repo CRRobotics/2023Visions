@@ -70,7 +70,7 @@ CAMERA_CONSTANTS = {
         ]),
         "yc": -.09 * math.sin(math.radians(22.5)),
         "xc": -.05 - .09 * math.cos(math.radians(22.5)),
-        "thetar": - 22.5
+        "thetar": 22.5
 
     },
     0:{
@@ -83,7 +83,7 @@ CAMERA_CONSTANTS = {
         ]),
         "yc": .09 * math.sin(math.radians(22.5)),
         "xc": -.05 - .09 * math.cos(math.radians(22.5)),
-        "thetar": 22.5
+        "thetar": -22.5
     }
 }
 
