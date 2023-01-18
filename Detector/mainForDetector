@@ -1,8 +1,8 @@
 
 import cv2 
 import numpy as np
-import functions_4_detector as f
-import constants_4_detector as constants
+import functionsForDetector as f
+import constantsForDetector as constants
 vid = cv2.VideoCapture(0)
 while(vid.isOpened()):    
     ret, frame = vid.read()  
