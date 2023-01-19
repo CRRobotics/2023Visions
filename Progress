@@ -1,0 +1,15 @@
+1.Wrote code to detect gamepieces, but only tells center of the gamepiece
+2.Got RGB-D camera, need python 3.7 to install the library for it, current version is 3.11
+3.Built a  virtual environment that runs python 3.7 to solve problem 2.
+    The command lines I used:
+        virtualenv Camera_env --python=python3.7
+        Camera_env\Scripts\activate.bat
+        pip install pipenv
+        pip install pyrealsense2
+        pip install opencv-python
+    Aware: Adam Newhouse told me to use pipenv->pipenv --python3.7, but I didn't use it at all.->BIG PROBLEM.
+4.Next step:
+    Learn library for the RGB-D camera
+    Learn how virtual environment works
+
+
