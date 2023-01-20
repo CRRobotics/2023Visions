@@ -70,7 +70,7 @@ CAMERA_CONSTANTS = {
         "distortion":np.array([
             [ 0.07608043, -0.22768113, -0.00260825, -0.00425322,  0.49783845]
         ]),
-        "yc": -.09 * math.sin(math.radians(22.5)),
+        "yc": .09 * math.sin(math.radians(22.5)),
         "xc": -.05 - .09 * math.cos(math.radians(22.5)),
         "thetar": 22.5
 
@@ -83,7 +83,7 @@ CAMERA_CONSTANTS = {
         "distortion":np.array([
             [0.071468959300027085, -0.16401274740062791, 0, 0, 0.24746369126806475]
         ]),
-        "yc": .09 * math.sin(math.radians(22.5)),
+        "yc": -.09 * math.sin(math.radians(22.5)),
         "xc": -.05 - .09 * math.cos(math.radians(22.5)),
         "thetar": -22.5
     }

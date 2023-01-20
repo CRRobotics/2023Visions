@@ -37,7 +37,9 @@ def pushval(networkinstance, tablename:str, valuename, value:float):
     
 
 def getDetector():
-    return apriltag( constants.TAG_FAMILY)
+    aprilobj = apriltag( constants.TAG_FAMILY)
+    # aprilobj["maxhamming"] = 5
+    return aprilobj
 
 
 def getDetections(detector, frame):
@@ -139,21 +141,23 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
 
             # Signs of x and y coordinates on unit circle
-            # sx = 1 if pointCoords[0][0] <= 0 else -1
-            # sy = 1 if pointCoords[1][0] <= 0 else -1
+            sx = 1 if pointCoords[0][0] <= 0 else -1
+            sy = 1 if pointCoords[1][0] <= 0 else -1
             # # Modify theta based on coordinate quadrant to compensate for arctan only going from -90 to 90
-            # ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
+            ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
+            ztheta -= 90
+            if ztheta < 0: ztheta += 360
             # print(ztheta)
 
-            def mod_but_with_decimals(x, y):
-                return x - math.floor(x / y) * y
+            # def mod_but_with_decimals(x, y):
+            #     return x - math.floor(x / y) * y
 
-            if pointX >= 0:
-                ztheta = mod_but_with_decimals(math.degrees(math.atan(pointY / pointX)), 360)
-            else:
-                ztheta = 180 + math.atan(pointY / pointX)
+            # if pointX >= 0:
+            #     ztheta = mod_but_with_decimals(math.degrees(math.atan(pointY / pointX)), 360)
+            # else:
+            #     ztheta = 180 + math.degrees(math.atan(pointY / pointX))
 
-            ztheta -= 90
+            # ztheta -= 90
 
             ax, ay, az = euler_angles_r
 
@@ -203,6 +207,7 @@ def mergeCams(vecsdicts):
 def getRobotVals(ay, cameraid, px, py):
     #print("ay %s, px, %s, py%s"%(ay, px, py))
     robotheta = math.radians(ay - constants.CAMERA_CONSTANTS[cameraid]["thetar"])
+    if robotheta > math.pi: robotheta -= math.tau
     xr = constants.CAMERA_CONSTANTS[cameraid]["xc"]
     yr = constants.CAMERA_CONSTANTS[cameraid]["yc"]
 
