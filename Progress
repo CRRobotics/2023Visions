@@ -1,24 +1,25 @@
 This is what Julius Won and Rocky Shao have been doing is the past days of build.
-Wrote code to detect gamepieces, but only tells center of the gamepiece on webcam frame, still need angle and distance to gamepieces.
-Problem: Got RGB-D camera(tells distance to gamepiece), need python 3.7 to install the library for it, current version is 3.11
 
-In order to counter problem:
-    1.Julius reseted his computer and reinstalled python 3.7, a way to solve the problem.
-    2.Rocky built a virtual environment that runs python 3.7 to solve problem 2.
-        The command lines Rocky used:
+Wrote code to detect gamepieces,tells center of the gamepiece and accurate distance from the center of the gamepiece to the camera.
+Still need angle and distance to gamepieces.
+In order to install library for camera:
+        Use command lines:
+        
+        
             virtualenv Camera_env --python=python3.7
             Camera_env\Scripts\activate.bat
             pip install pipenv
-            pip install pyrealsense2---->this is the library for the RGB-D camera, and it successfully intsalled it in my virtual environment called Camera_env
+            pip install pyrealsense2          //this is the library for the RGB-D camera, and it successfully intsalled it in my virtual environment called Camera_env
             pip install opencv-python
-        Aware: Adam Newhouse told us to use pipenv->pipenv --python3.7, but Rocky didn't use it at all.->BIG PROBLEM.
+            
+            
+        Aware: Adam Newhouse told us to use pipenv->pipenv --python3.7, but didn't use it at all.->MIGHT BE PROBLEM?.
     
 Next step:
-    Learn library for the RGB-D camera to get accurate distance to gamepieces.
     Learn how virtual environment works and how will it coperate with the computer that will be on the final robot.
-    Use pipenv
+    Use pipenv?
     If we hit a wall through virtual environment, we might have to build the library from source.
     Copy code from last year to tell angle to gamepieces.
-    
+    Considering to use machine learning to detect gamepieces in a quiker and more reliable way then HSV filter
 
 
