@@ -126,7 +126,20 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
             p = np.hstack((rotationmatrix, tvec))
 
-            euler_angles_r = -cv.decomposeProjectionMatrix(p)[6]
+            _, _, _, _, _, rmatZ, euler_angles_r = cv.decomposeProjectionMatrix(p)
+
+            euler_angles_r = -euler_angles_r
+            # print(ztheta)
+            # print(rmatZ)
+
+            # Get coordinates of rotated point on unit sphere
+            pointCoords = np.dot(rotationmatrix.T, np.array([[1],[0],[0]]))
+            # Signs of x and y coordinates on unit circle
+            sx = 1 if pointCoords[0][0] <= 0 else -1
+            sy = 1 if pointCoords[1][0] <= 0 else -1
+            # Modify theta based on coordinate quadrant to compensate for arctan only going from -90 to 90
+            ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
+            # print(ztheta)
 
             ax, ay, az = euler_angles_r
 
@@ -134,7 +147,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
 
 
-            robocoords, robotheta = getRobotVals(ay, cameraid, pz, px)
+            robocoords, robotheta = getRobotVals(ztheta, cameraid, px, py)
 
             toreturn["pos"] = robocoords
 
@@ -148,10 +161,12 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             rvx = math.degrees(rvx[0])
             rvy = math.degrees(rvy[0])
             rvz = math.degrees(rvz[0])
-            cv.putText(frame, " PX: %.4f  PY: %.4f  PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-            cv.putText(frame, " AX: %.4f  AY: %.4f  AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-            # cv.putText(frame, " RX: %.4f  RY: %.4f RTHETA: %.4f"%(rx, ry, robotheta), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
-            cv.putText(frame, "RVX: %.4f RVY: %.4f RVZ: %.4f"%(rvx, rvy, rvz), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255,255, 0))
+
+            cv.putText(frame, " PX: %.4f  PY: %.4f  PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            # cv.putText(frame, " AX: %.4f  AY: %.4f  AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            cv.putText(frame, " ZTHETA: %.4f"%(ztheta), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            cv.putText(frame, " RX: %.4f  RY: %.4f RTHETA: %.4f"%(rx, ry, robotheta), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            # cv.putText(frame, "RVX: %.4f RVY: %.4f RVZ: %.4f"%(rvx, rvy, rvz), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
             return toreturn
 
 def mergeCams(vecsdicts):
