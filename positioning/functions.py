@@ -132,14 +132,28 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             # print(ztheta)
             # print(rmatZ)
 
-            # Get coordinates of rotated point on unit sphere
+            # Get coordinates of rotated point on unit sphere. We want to project it onto the x-y axis
             pointCoords = np.dot(rotationmatrix.T, np.array([[1],[0],[0]]))
+
+            pointX, pointY = [pointCoords[0][0], pointCoords[1][0]]
+
+
             # Signs of x and y coordinates on unit circle
-            sx = 1 if pointCoords[0][0] <= 0 else -1
-            sy = 1 if pointCoords[1][0] <= 0 else -1
-            # Modify theta based on coordinate quadrant to compensate for arctan only going from -90 to 90
-            ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
+            # sx = 1 if pointCoords[0][0] <= 0 else -1
+            # sy = 1 if pointCoords[1][0] <= 0 else -1
+            # # Modify theta based on coordinate quadrant to compensate for arctan only going from -90 to 90
+            # ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
             # print(ztheta)
+
+            def mod_but_with_decimals(x, y):
+                return x - math.floor(x / y) * y
+
+            if pointX >= 0:
+                ztheta = mod_but_with_decimals(math.degrees(math.atan(pointY / pointX)), 360)
+            else:
+                ztheta = 180 + math.atan(pointY / pointX)
+
+            ztheta -= 90
 
             ax, ay, az = euler_angles_r
 
