@@ -1,37 +1,46 @@
-
-import cv2 
-import numpy as np
-import functionsForDetector as f
+from realsense_camera import *
+import cv2
+#load real sense camera
+rs=RealsenseCamera()
+from functionsForDetector import *
+f=functions()
 import constantsForDetector as constants
-vid = cv2.VideoCapture(0)
-while(vid.isOpened()):    
-    ret, frame = vid.read()  
+while True:
+    ret,frame,depth_frame=rs.get_frame_stream()
+    
+
+
+ 
     'CUBE'
     mask1=f.maskGenerator(frame,constants.lower_purple,constants.higher_purple)
-    contours1=f.convexHull(frame)    
+    contours1=f.convexHull(mask1)    
     contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
         biggest_contour1=f.find_biggest_contour(contours1)
         center1=f.find_and_draw_center_of_target(frame,biggest_contour1)
-       
+        point_x1,point_y1=center1
+        distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
+        cv2.putText(frame,'{}cm'.format(distance_cm1),(point_x1,point_y1-10),0,1,(0,0,255),2)
+
+        
     'CONE'
     mask2=f.maskGenerator(frame,constants.lower_yellow,constants.higher_yellow)
-    contours2=f.convexHull(frame)    
+    contours2=f.convexHull(mask2)    
     contours2=f.filter_out_contours_that_doesnot_look_like_square(contours2)
     if len(contours2) >0:
         biggest_contour2=f.find_biggest_contour(contours2)
         center2=f.find_and_draw_center_of_target(frame,biggest_contour2)
+        point_x2,point_y2=center2
+        distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
+        cv2.putText(frame,'{}cm'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
+
     
 
-    "Common stuff"
-    cv2.imshow('Camera view',frame)
-    # the 'q' button is set for break
-    if cv2.waitKey(55) & 0xFF == ord('q'):
+    
+    cv2.imshow('BGr',frame)
+    key=cv2.waitKey(1)
+    if key == 27:
         break
-       
-vid.release()
-# Destroy all the windows
+    #print depth_frame, it shows the depth of each pix in mm
+
 cv2.destroyAllWindows()
-
-
-
