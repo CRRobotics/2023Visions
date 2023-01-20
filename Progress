@@ -20,6 +20,6 @@ Next step:
     Use pipenv?
     If we hit a wall through virtual environment, we might have to build the library from source.
     Copy code from last year to tell angle to gamepieces.
-    Considering to use machine learning to detect gamepieces in a quiker and more reliable way then HSV filter
+    
 
 
