@@ -9,7 +9,9 @@ print("We out")
 
 
 def process_frame(cameraid:int, nt):
+    # print("thread on")
     cap = cv.VideoCapture(cameraid)
+    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     detector = getDetector()
     # global globalvecsdict
 
@@ -27,7 +29,7 @@ def process_frame(cameraid:int, nt):
         success, frame1 = cap.read()
 
         if not success:
-            print("failed to get image")
+            print("failed to get image from camid ", cameraid)
             continue
 
         vecsdict = getVecs(frame1, cammat, distco, detector, cameraid)
@@ -67,9 +69,9 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=process_frame, args=[4,nt])
 
     t1.start()
-    # t2.start()
+    t2.start()
     t3.start()
     t1.join()
-    # t2.join()
+    t2.join()
     t3.join()
     print("Done!")
