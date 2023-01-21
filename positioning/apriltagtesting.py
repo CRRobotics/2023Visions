@@ -37,22 +37,10 @@ def process_frame(cameraid:int, nt):
         if vecsdict:
             robotheta = vecsdict["angle"]
             rx, ry, _ = vecsdict["pos"]
-            # pushval(nt, f"{cameraid}", "Robotheta", robotheta)
+            # pushval(nt, f"{cameraid}", "theta", robotheta)
             # pushval(nt, f"{cameraid}", "rx",rx )
             # pushval(nt, f"{cameraid}", "ry", ry)
             # pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
-            
-            # globalvecsdict[cameraid] = {
-            #     "gx": px[0][0],
-            #     "gy": py[0][0],
-            #     "theta":robotheta
-            # }
-
-        # if globalvecsdict[0] and globalvecsdict[2]:
-        #     ...
-        #     pos, rot = mergeCams(globalvecsdict)
-        #     print("Pos: ", pos, "\nRot: ", rot)
-        # print(globalvecsdict)
         cv.imshow(f"CAMID{cameraid}:", frame1)
         cv.waitKey(1)
         # ts = time()
