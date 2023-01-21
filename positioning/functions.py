@@ -67,8 +67,6 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
     detections = getDetections(detector,frame)
 
     toreturn = {
-        "tvecs":[],
-        "rvecs":[]
     }
 
     if detections:

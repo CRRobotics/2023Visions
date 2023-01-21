@@ -53,7 +53,7 @@ def process_frame(cameraid:int, nt):
         # print(globalvecsdict)
         cv.imshow(f"CAMID{cameraid}:", frame1)
         cv.waitKey(1)
-        ts = time()
+        # ts = time()
 
 if __name__ == "__main__":
     globalvecsdict = {
@@ -64,8 +64,12 @@ if __name__ == "__main__":
     nt = 0#networkConnect()
     t1 = threading.Thread(target=process_frame, args=[0,nt])
     t2 = threading.Thread(target=process_frame, args=[2,nt])
+    t3 = threading.Thread(target=process_frame, args=[4,nt])
+
     t1.start()
-    t2.start()
+    # t2.start()
+    t3.start()
     t1.join()
-    t2.join()
+    # t2.join()
+    t3.join()
     print("Done!")
