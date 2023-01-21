@@ -1,7 +1,0 @@
-#HSV values for yellow and purple
-import numpy as np
-
-lower_yellow=np.array([19,110,100])
-higher_yellow=np.array([29,255,255])
-lower_purple=np.array([111,47,101])
-higher_purple=np.array([133,225,250])
