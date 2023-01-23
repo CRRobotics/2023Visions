@@ -14,5 +14,7 @@ horizontal_pixle_num=1280
 vertical_pixle_num=720
 horizontal_rad_per_pixle=0.00117264307
 vertical_rad_per_pixle=0.00138171897
-
+#height in CM
+height = 96
+cameraMountAngle = 65
 focal_length=1080  # mm

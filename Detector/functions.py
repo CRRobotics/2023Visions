@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import constants
 class functions:
+	#returns the height off the ground of the supplied pixel
+    def heightFromDistance(pixelY, pixelDist):
+        return height-pixelDist*math.cos((pixelDist*0.059)+constants.cameraMountAngle)
 
     def maskGenerator(self,img,lower_color,higher_color):
         img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
