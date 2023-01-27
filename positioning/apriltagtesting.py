@@ -3,17 +3,23 @@ import constants
 from functions import *
 import numpy as np
 import threading
-from time import time
+from time import sleep
 print("We out")
 
 
 
 def process_frame(cameraid:int, nt):
-    # print("thread on")
-    cap = cv.VideoCapture(cameraid)
-    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    #cap = cv.VideoCapture(cameraid)
+    cap = 0
+    while True:
+        cap = cv.VideoCapture(cameraid)
+        if cap.isOpened():
+            break
+        else:
+            sleep(0.001)
+
     detector = getDetector()
-    # global globalvecsdict
+    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
     cammat = constants.CAMERA_CONSTANTS[cameraid]["matrix"]
     distco = constants.CAMERA_CONSTANTS[cameraid]["distortion"]
@@ -46,10 +52,7 @@ def process_frame(cameraid:int, nt):
         # ts = time()
 
 if __name__ == "__main__":
-    globalvecsdict = {
-        0: {},
-        2: {}
-    }
+
 
     nt = 0#networkConnect()
     t1 = threading.Thread(target=process_frame, args=[0,nt])

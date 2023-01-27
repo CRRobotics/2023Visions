@@ -38,7 +38,6 @@ def pushval(networkinstance, tablename:str, valuename, value:float):
 
 def getDetector():
     aprilobj = apriltag( constants.TAG_FAMILY)
-    # aprilobj["maxhamming"] = 5
     return aprilobj
 
 
