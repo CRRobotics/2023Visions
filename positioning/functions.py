@@ -39,7 +39,7 @@ def pushval(networkinstance, tablename:str, valuename, value:float):
     
 
 def getDetector():
-    aprilobj = apriltag( constants.TAG_FAMILY)
+    aprilobj = apriltag(constants.TAG_FAMILY, maxhamming=0, blur = 0.1)
     return aprilobj
 
 
@@ -91,12 +91,12 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
                 cv.putText(frame, "id: %s"%(detection["id"]), (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
 
-                if detection["id"] in [8]:
+                if detection["id"] in [5, 6, 7, 8]:
                     for coord in constants.CORNERS_AS_IN_FIELD_MAT_OTHER_WAY:
-                        objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
+                        objectpoints.append(coord + constants.ID_POS_NEW[detection["id"]]["center"])
                 else:
                     for coord in constants.CORNERS_AS_IN_FIELD:
-                        objectpoints.append(coord + constants.ID_POS[detection["id"]]["center"])
+                        objectpoints.append(coord + constants.ID_POS_NEW[detection["id"]]["center"])
 
                 for corner in detection["lb-rb-rt-lt"]:
                     cornerpoints.append(corner)
@@ -188,7 +188,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
     return {
         "pos": (63900,63900,63900),
         "angle":63900,
-        "tags":63900
+        "tags":0
     }
 def mergeCams(vecsdicts):
     # Get positions, rotations, and number of tags each one sees
@@ -251,9 +251,9 @@ def waitForCam(path):
             print("not open")
             sleep(0.001)
 
-def logStuff(camid, rx, ry, rt):
+def logStuff(camid, rx, ry, rt, time):
     with open("log.csv", "a+", newline="") as log:
         c = csv.writer(log)
         c.writerow(
-            [camid, rx, ry, rt]
+            [camid, rx, ry, rt, time]
         )
