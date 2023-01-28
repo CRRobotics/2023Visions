@@ -10,6 +10,7 @@ from networktables import NetworkTables as nt
 import threading
 import math
 from time import sleep
+import csv
 
 def networkConnect() -> any:
     cond = threading.Condition()
@@ -245,3 +246,10 @@ def waitForCam(path):
         else:
             print("not open")
             sleep(0.001)
+
+def logStuff(camid, rx, ry, rt):
+    with open("log.csv", "a+", newline="") as log:
+        c = csv.writer(log)
+        c.writerow(
+            [camid, rx, ry, rt]
+        )
