@@ -12,13 +12,7 @@ print("We out")
 
 def process_frame(cameraid, path, nt, headless = False):
     # cap = cv.VideoCapture(cameraid)
-    cap = 0
-    while True:
-        cap = cv.VideoCapture(path)
-        if cap.isOpened():
-            break
-        else:
-            sleep(0.001)
+    cap = waitForCam(path)
 
     detector = getDetector()
     cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
@@ -27,17 +21,15 @@ def process_frame(cameraid, path, nt, headless = False):
     distco = constants.CAMERA_CONSTANTS[cameraid]["distortion"]
     # ts = 0
 
-    while cap.isOpened():
-        # delta = time() - ts
-        # if delta < 0.03:
-        #     ts = time()
-        #     cv.waitKey(1)
-        #     continue
+    while True:
 
         success, frame1 = cap.read()
 
         if not success:
             print("failed to get image from camid ", cameraid)
+            cap.release()
+            cap = waitForCam(path)
+            cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
             continue
 
         vecsdict = getVecs(frame1, cammat, distco, detector, cameraid)
@@ -52,6 +44,7 @@ def process_frame(cameraid, path, nt, headless = False):
         if not headless: cv.imshow(f"CAMID{cameraid}:", frame1)
         cv.waitKey(1)
         # ts = time()
+        
 
 if __name__ == "__main__":
 

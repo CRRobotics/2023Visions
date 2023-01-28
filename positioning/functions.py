@@ -9,6 +9,7 @@ import constants
 from networktables import NetworkTables as nt
 import threading
 import math
+from time import sleep
 
 def networkConnect() -> any:
     cond = threading.Condition()
@@ -234,3 +235,13 @@ def getRobotVals(ay, cameraid, px, py):
     robocoords = np.dot(transformationmatrix, robotcoordsRelativetocam)
 
     return robocoords, robotheta
+
+def waitForCam(path):
+    while True:
+        cap = cv.VideoCapture(path)
+        if cap.isOpened():
+            print("open")
+            return cap
+        else:
+            print("not open")
+            sleep(0.001)
