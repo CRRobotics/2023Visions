@@ -5,21 +5,27 @@ import math
 class functions:
     # def getRotation
 
-    def getDistanceToObject(self,frame,y,d):
+    def getPerpindicularDistanceToObject(self,a,d):
         cameraMountAngle=1.134
-        pixleToDegree=0.00103
-        angle=pixleToDegree*y-cameraMountAngle
+        angle=a-cameraMountAngle
         b = 0-(d*math.sin(angle))
         # b=math.sqrt(d*d-height*height)
         #cv2.putText(frame,str(b),(2S00,400),0,1,(0,0,255),2)
         return b
     
 
-    def getAbsoluteDistance(self,frame,pDistance,angle):
+    def getFullDistanceToObject(self,frame,pDistance,angle):
         pixelToDegree=0.000946
         output=pDistance/math.cos(pixelToDegree*angle)
         return output
 
+    def getDirectDistanceToPixel(self, deltaPixelX,deltaPixelY,d):
+        xPixelToDegree = 0.00946
+        yPixelToDegree = 0.00103
+        pitch = deltaPixelY*yPixelToDegree
+        yaw = xPixelToDegree*deltaPixelX
+        pDist = getPerpindicularDistanceToObject(pitch,d)
+        distance = getFullDistanceToObject(pDist,yaw)
 
 
     def maskGenerator1(self,img,lower_color,higher_color):
