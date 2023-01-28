@@ -4,15 +4,17 @@ from functions import *
 import numpy as np
 import threading
 from time import sleep
+import sys
+import os
 print("We out")
 
 
 
-def process_frame(cameraid:int, nt):
-    #cap = cv.VideoCapture(cameraid)
+def process_frame(cameraid, path, nt, headless = False):
+    # cap = cv.VideoCapture(cameraid)
     cap = 0
     while True:
-        cap = cv.VideoCapture(cameraid)
+        cap = cv.VideoCapture(path)
         if cap.isOpened():
             break
         else:
@@ -47,17 +49,18 @@ def process_frame(cameraid:int, nt):
             # pushval(nt, f"{cameraid}", "rx",rx )
             # pushval(nt, f"{cameraid}", "ry", ry)
             # pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
-        cv.imshow(f"CAMID{cameraid}:", frame1)
+        if not headless: cv.imshow(f"CAMID{cameraid}:", frame1)
         cv.waitKey(1)
         # ts = time()
 
 if __name__ == "__main__":
 
+    headless = "-h" in sys.argv
 
     nt = 0#networkConnect()
-    t1 = threading.Thread(target=process_frame, args=[0,nt])
-    t2 = threading.Thread(target=process_frame, args=[2,nt])
-    t3 = threading.Thread(target=process_frame, args=[4,nt])
+    t1 = threading.Thread(target=process_frame, args=[0, os.path.realpath("/dev/v4l/by-path/pci-0000:06:00.3-usb-0:1.1:1.0-video-index0"),nt,headless])
+    t2 = threading.Thread(target=process_frame, args=[2, os.path.realpath("/dev/v4l/by-path/pci-0000:06:00.3-usb-0:1.3:1.0-video-index0"),nt,headless])
+    t3 = threading.Thread(target=process_frame, args=[4, os.path.realpath("/dev/v4l/by-path/pci-0000:06:00.3-usb-0:1.2:1.0-video-index0"),nt,headless])
 
     t1.start()
     t2.start()
