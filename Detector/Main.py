@@ -1,9 +1,9 @@
+
 from realsense_camera import *
 import cv2
 #load real sense camera
 rs=RealsenseCamera()
-from functions import *
-f=functions()
+import functions as f
 import constants
 while True:
     ret, frame, depth_frame = rs.get_frame_stream()
@@ -46,8 +46,8 @@ while True:
         
         b=f.getDirectDistanceToPixel(x,y,d)
         cv2.putText(frame,"distance to bot"+str(b)+'cm',(200,400),0,1,(0,0,255),2)
-        angleToTurn=(point_x2-720)*0.000946
-        cv2.putText(frame,'angle to turn'+str(angleToTurn*180/3.1415926)+'degrees',(200,600),0,1,(0,0,255),2)
+        # angleToTurn=(point_x2-720)*0.000946
+        # cv2.putText(frame,'angle to turn'+str(angleToTurn*180/3.1415926)+'degrees',(200,600),0,1,(0,0,255),2)
 
 
         

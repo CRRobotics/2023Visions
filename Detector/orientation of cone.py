@@ -5,8 +5,8 @@ from realsense_camera import *
 import cv2
 #load real sense camera
 rs=RealsenseCamera()
-from functions import *
-f=functions()
+import functions as f
+
 import constants
 
  
