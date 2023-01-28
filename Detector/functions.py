@@ -1,26 +1,49 @@
 import cv2
 import numpy as np
 import constants
+import math
 class functions:
-	#returns the height off the ground of the supplied pixel
-    def heightFromDistance(pixelY, pixelDist):
-        return height-pixelDist*math.cos((pixelDist*0.059)+constants.cameraMountAngle)
+    # def getRotation
 
-    def maskGenerator(self,img,lower_color,higher_color):
+    def getDistanceToObject(self,frame,y,d):
+        cameraMountAngle=1.134
+        pixleToDegree=0.00103
+        angle=pixleToDegree*y-cameraMountAngle
+        b = 0-(d*math.sin(angle))
+        # b=math.sqrt(d*d-height*height)
+        #cv2.putText(frame,str(b),(2S00,400),0,1,(0,0,255),2)
+        return b
+    
+
+    def getAbsoluteDistance(self,frame,pDistance,angle):
+        pixelToDegree=0.000946
+        output=pDistance/math.cos(pixelToDegree*angle)
+        return output
+
+
+
+    def maskGenerator1(self,img,lower_color,higher_color):
         img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-        img=cv2.blur(img, (5,5)) 
-        mask=cv2.inRange(img,lower_color,higher_color)    
+        img_blur=cv2.blur(img, (5,5)) 
+        mask=cv2.inRange(img_blur,lower_color,higher_color)    
         kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
         mask=cv2.erode(mask,kernel1,iterations=3)
         mask=cv2.dilate(mask,kernel1,iterations=1)       
         return mask
-
+    def maskGenerator2(self,img):
+        b,g,r=cv2.split(img)     
+        diff = cv2.subtract(g, b)
+        ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+        kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+        mask=cv2.erode(mask,kernel1,iterations=3)
+        mask=cv2.dilate(mask,kernel1,iterations=1) 
+        return mask
 
     def findContours(self,mask):
         contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-        ConvexHull=[cv2.convexHull(contour) for contour in contours]
-        return ConvexHull
-        # return contours
+        contours=[cv2.convexHull(contour) for contour in contours]
+        return contours
+        #return contours
     
 
 
@@ -42,14 +65,14 @@ class functions:
         return biggest_contour
 
         
-    def find_and_draw_center_of_target(self,frame,biggest_contour):
-        x,y,w,h=cv2.boundingRect(biggest_contour)
+    def find_center_and_draw_center_and_contour_of_target(self,frame,biggest_contour):
         cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
         moments = cv2.moments(biggest_contour)
         if moments['m00'] !=0:
             center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
             cv2.circle(frame, center, 3, (0, 0, 255), -1)
             return center
+           
 
 
 
