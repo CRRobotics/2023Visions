@@ -185,7 +185,11 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             cv.putText(frame, " RX: %.4f  RY: %.4f RTHETA: %.4f"%(rx, ry, math.degrees(robotheta)), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
             # cv.putText(frame, "RVX: %.4f RVY: %.4f RVZ: %.4f"%(rvx, rvy, rvz), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
             return toreturn
-
+    return {
+        "pos": (63900,63900,63900),
+        "angle":63900,
+        "tags":63900
+    }
 def mergeCams(vecsdicts):
     # Get positions, rotations, and number of tags each one sees
     pos1 = vecsdicts[0]["pos"]
