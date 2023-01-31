@@ -36,6 +36,13 @@ def process_frame(cameraid, path, nt, headless = False):
         if vecsdict:
             robotheta = vecsdict["angle"]
             rx, ry, _ = vecsdict["pos"]
+
+            if cameraid == 0:
+                constants.RX_LOG.append(rx[0])
+                constants.RY_LOG.append(ry[0])
+                constants.RT_LOG.append(robotheta)
+                realtime_log()
+
             logStuff(cameraid, rx, ry, robotheta, timezz)
             pushval(nt, f"{cameraid}", "theta", robotheta)
             pushval(nt, f"{cameraid}", "rx",rx )
