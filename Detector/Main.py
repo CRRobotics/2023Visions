@@ -38,7 +38,7 @@ while True:
             point_x2,point_y2=center2
             distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
             distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
-            #print('{}cm,Cone'.format(distance_cm2))
+            print('{}cm,Cone'.format(distance_cm2))
 
    
 
