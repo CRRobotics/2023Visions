@@ -1,20 +1,26 @@
 #HSV values for yellow and purple
 import numpy as np
-lower_yellow=np.array([19,110,100])
-higher_yellow=np.array([29,255,255])
-lower_purple=np.array([111,47,101])
-higher_purple=np.array([133,225,250])
+
+# lower_yellow=np.array([19,110,100])
+
+# higher_yellow=np.array([29,255,255])
+# lower_purple=np.array([106,154,61])
+# higher_purple=np.array([116,255,255])
+lower_yellow=np.array([0,0,0])
+
+higher_yellow=np.array([40,255,255])
+
+lower_purple=np.array([115,0,0])
+higher_purple=np.array([180,255,255])
 
 
 #determin radians per pixle
 
-horizontal_fov=1.5001               #in rad
-vertical_fov=0.9948376736
 horizontal_pixle_num=1280
 vertical_pixle_num=720
-horizontal_rad_per_pixle=0.00117264307
-vertical_rad_per_pixle=0.00138171897
-#height in CM
-height = 96
-cameraMountAngle = 65
-focal_length=1080  # mm
+
+fov_x=69.4#degree
+fov_y=42.5
+cam_height=76#cm
+
+
