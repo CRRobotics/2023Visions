@@ -38,6 +38,8 @@ def get_distance_and_angle(height_of_cam,distance_to_cam,x_of_target,y_of_target
     angle=math.degrees(math.asin(((distance_to_cam) * (math.sin((x_of_target-640)*((math.radians(constants.fov_x))/1280)))/distance)%1))
     #cv2.putText(frame,"distance to Bot"+str(distance)+'cm',(x_of_target,y_of_target+30),0,1,(0,0,255),2)
     #cv2.putText(frame,"angle to Bot"+str(angle)+'degree',(x_of_target,y_of_target+60),0,1,(0,0,255),2)
+    distance=float(distance)
+    angle=float(angle)
     return distance,angle
 def getCorners(convexHull):
     Array =convexHull
