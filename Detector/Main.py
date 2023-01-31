@@ -13,28 +13,32 @@ while True:
  
     'CUBE'
   
-    mask1 = f.maskGenerator(frame,constants.lower_purple,constants.higher_purple)
+    mask1 = f.maskGenerator1(frame)
     contours1=f.findContours(mask1)    
     contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
         biggest_contour1=f.find_biggest_contour(contours1)
-        center1=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour1)
-        point_x1,point_y1=center1
-        distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
-        distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
-        print('{}cm,Cube'.format(distance_cm1),distance1,angle1)
+        area1=cv2.contourArea(biggest_contour1) 
+        if area1>=6000:
+            center1=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour1)
+            point_x1,point_y1=center1
+            distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
+            distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
+            print('{}cm,Cube'.format(distance_cm1))
 
         
     'CONE'
-    mask2=f.maskGenerator(frame,constants.lower_yellow,constants.higher_yellow)
+    mask2=f.maskGenerator2(frame,constants.lower_yellow,constants.higher_yellow)
     contours2=f.findContours(mask2)     
     if len(contours2) >0:
         biggest_contour2=f.find_biggest_contour(contours2)
-        center2=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
-        point_x2,point_y2=center2
-        distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
-        distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
-        print('{}cm,Cube'.format(distance_cm2),distance2,angle2)
+        area2=cv2.contourArea(biggest_contour2) 
+        if area2>=6000:
+            center2=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
+            point_x2,point_y2=center2
+            distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
+            distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
+            #print('{}cm,Cone'.format(distance_cm2))
 
    
 
