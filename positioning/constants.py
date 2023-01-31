@@ -102,8 +102,8 @@ CAMERA_CONSTANTS = {
         "distortion":np.array([
             [ .080104803843758079, -.15622876501216132, 0, 0,  .12861546974246932]
         ]),
-        "yc": .34 * math.sin(math.radians(22.5-0.75)), #.34 for kitbot, .9 for duckbot
-        "xc": -.05 - .34 * math.cos(math.radians(22.5-0.75)),
+        "yc": .03175, #.34 for kitbot, .9 for duckbot #.03175 for swerve
+        "xc": .3937,
         "thetar": 22.5 - 0.75
 
     },
@@ -115,8 +115,8 @@ CAMERA_CONSTANTS = {
         "distortion":np.array([
             [0.071468959300027085, -0.16401274740062791, 0, 0, 0.24746369126806475]
         ]),
-        "yc": -.34 * math.sin(math.radians(22.5-0.75)),
-        "xc": -.05 - .34 * math.cos(math.radians(22.5-0.75)),
+        "yc": .2921,
+        "xc": .2413,
         "thetar": -22.5 - 0.75
     },
     4:{
