@@ -2,7 +2,7 @@ from pupil_apriltags import *
 import json
 import numpy as np
 import math
-
+import matplotlib.pyplot as plt
 
 TAG_FAMILY = "tag16h5"
 
@@ -169,5 +169,10 @@ CORNERS_AS_IN_FIELD_MAT_OTHER_WAY = np.array(
     ]
 
 )
+
+FIG = plt.figure(figsize=(30,8))
+RX_LOG = []
+RY_LOG = []
+RT_LOG = []
 
 SERVER = "10.6.39.2"

@@ -41,7 +41,8 @@ def process_frame(cameraid, path, nt, headless = False):
                 constants.RX_LOG.append(rx[0])
                 constants.RY_LOG.append(ry[0])
                 constants.RT_LOG.append(robotheta)
-                realtime_log()
+                if not headless:
+                    realtime_log()
 
             logStuff(cameraid, rx, ry, robotheta, timezz)
             pushval(nt, f"{cameraid}", "theta", robotheta)

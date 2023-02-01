@@ -11,6 +11,8 @@ import threading
 import math
 from time import sleep
 import csv
+# import matplotlib.pyplot as plt
+# import matplotlib.animation as animation
 
 def networkConnect() -> any:
     cond = threading.Condition()
@@ -252,8 +254,30 @@ def waitForCam(path):
             sleep(0.001)
 
 def logStuff(camid, rx, ry, rt, time):
-    with open("log.csv", "a+", newline="") as log:
+    with open("/home/crr/2023Visions/positioning/log.csv", "a+", newline="") as log:
         c = csv.writer(log)
         c.writerow(
             [camid, rx, ry, rt, time]
         )
+
+# def graph():
+#     if len(constants.RX_LOG) > 1000:
+#         del constants.RX_LOG[0]
+#         del constants.RY_LOG[0]
+#         del constants.RT_LOG[0]
+
+#     t = [i for i in range(len(constants.RX_LOG))]
+
+#     plt.subplot(3, 1, 1)
+#     plt.plot(t, constants.RX_LOG, label="rx")
+#     plt.legend()
+#     plt.subplot(3, 1, 2)
+#     plt.plot(t, constants.RY_LOG, label="ry")
+#     plt.legend()
+#     plt.subplot(3, 1, 3)
+#     plt.plot(t, constants.RT_LOG, label="rt")
+#     plt.legend()
+
+# def realtime_log():
+#     ani = animation.FuncAnimation(constants.FIG, graph, save_count=0, cache_frame_data=False)
+#     plt.show()
