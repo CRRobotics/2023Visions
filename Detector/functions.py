@@ -3,29 +3,31 @@ import cv2
 import numpy as np
 import constants
 import math
+import threading
 
+from networktables import NetworkTables as nt
+def pushval(networkinstance, tablename:str, valuename, value:float):
+    table = networkinstance.getTable(tablename)
+    table.putNumber(valuename, value)
 
-#Julius
-# def getPerpindicularDistanceToObject(a,d):
-#     cameraMountAngle=1.134
-#     angle=a-cameraMountAngle
-#     b = 0-(d*math.sin(angle))
-#     return b
+def networkConnect() -> any:
+    cond = threading.Condition()
+    notified = [False]
 
+    def connectionListener(connected, info):
+        print(info, '; Connected=%s' % connected)
+        with cond:
+            notified[0] = True
+            cond.notify()
 
-# def getFullDistanceToObject(pDistance,angle):
-#     pixelToDegree=0.000946
-#     output=pDistance/math.cos(pixelToDegree*angle)
-#     return output
+    nt.initialize(server=constants.SERVER)
+    nt.addConnectionListener(connectionListener, immediateNotify=True)
 
-# def getDirectDistanceToPixel(deltaPixelX,deltaPixelY,d):
-#     xPixelToDegree = 0.000946
-#     yPixelToDegree = 0.00103
-#     pitch = deltaPixelY*yPixelToDegree
-#     yaw = xPixelToDegree*deltaPixelX
-#     pDist = getPerpindicularDistanceToObject(pitch,d)
-#     distance = getFullDistanceToObject(pDist,yaw)
-#     return distance
+    with cond:
+        print("Waiting")
+        if not notified[0]:
+            cond.wait()
+    return nt
 
 
 
@@ -120,18 +122,21 @@ HSV MASK
 '''
 BGR MASK, 1 for cube, 2 for cone
 '''
-# def maskGenerator1(img):
-#     img==cv2.blur(img, (5,5)) 
-#     b,g,r=cv2.split(img)     
-#     diff = cv2.subtract(b,g)
-#     ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
-#     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-#     mask=cv2.erode(mask,kernel1,iterations=3)
-#     mask=cv2.dilate(mask,kernel1,iterations=1) 
-#     return mask
 
 
-def maskGenerator(img,lower_color,higher_color):
+
+def maskGenerator1(img):
+    img==cv2.blur(img, (5,5)) 
+    b,g,r=cv2.split(img)     
+    diff = cv2.subtract(b,g)
+    ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    mask=cv2.erode(mask,kernel1,iterations=3)
+    mask=cv2.dilate(mask,kernel1,iterations=1) 
+    return mask
+
+
+def maskGenerator2(img,lower_color,higher_color):
 
     #bgr math
     img==cv2.blur(img, (5,5)) 
