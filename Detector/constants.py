@@ -21,6 +21,6 @@ vertical_pixle_num=720
 
 fov_x=69.4#degree
 fov_y=42.5
-cam_height=76#cm
+cam_height=81-12.7#cm
 SERVER = "10.6.39.2"
 

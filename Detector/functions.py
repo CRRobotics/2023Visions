@@ -32,6 +32,9 @@ def networkConnect() -> any:
 
 
 
+
+
+
 '''
 get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
 '''
@@ -43,7 +46,9 @@ def get_distance_and_angle(height_of_cam,distance_to_cam,x_of_target,y_of_target
     distance=float(distance)
     angle=float(angle)
     return distance,angle
-def getCorners(convexHull):
+
+
+def getCorners(convexHull):#second stage dirivitive of all points
     Array =convexHull
     a=Array.tolist()
     b=[]#position of points
@@ -91,20 +96,30 @@ def getCorners(convexHull):
 
 
 
-# def find_distance_to_the_point_on_the_target_wich_is_on_the_ground(contour,depth_frame):
+def find_distance_to_the_point_on_the_target_which_is_on_the_ground_relative_to_cam(contour):
 
-#     points_array=contour.tolist()
-#     points_tuple=[]#position of convex points
-#     for i in points_array:
-#         for c in i:
-#             c=tuple(c)
-#             points_tuple.append(c)
-    
-#     d=[]#matching positions of b on depth map
-#     for i in points_tuple:
-#         x,y=i
-#         e=depth_frame[y,x]#first y then x
-#         d.append(e)
+    points_array=contour.tolist()
+    points_tuple=[]#position of convex points
+    for i in points_array:
+        for c in i:
+            c=tuple(c)
+            points_tuple.append(c)
+
+    # d=[]#matching positions of convex points  on depth map
+    # for i in points_tuple:
+    #     x,y=i
+    #     e=depth_frame[y,x]#first y then x
+    #     d.append(e)
+    biggest_y=0
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if y >= biggest_y:
+            biggest_y=y
+            indexer=i
+    return points_tuple[indexer]#position of the point with the biggest y value.
+
+
 
 '''
 HSV MASK
@@ -154,6 +169,21 @@ def maskGenerator2(img,lower_color,higher_color):
     maskb=cv2.dilate(maskb,kernel1,iterations=1)
     maskab = cv2.bitwise_and(maska, maskb)
     return maskab
+    
+def maskGenerator3(img):
+
+    #bgr math
+    img==cv2.blur(img, (5,5)) 
+    b,g,r=cv2.split(img)     
+    diff = cv2.add(g, r)
+    ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    maska=cv2.erode(maska,kernel1,iterations=3)
+    maska=cv2.dilate(maska,kernel1,iterations=1) 
+    return maska
+
+
+
 
 def findContours(mask):
     contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
