@@ -39,8 +39,12 @@ def networkConnect() -> any:
 get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
 '''
 def get_distance_and_angle(height_of_cam,distance_to_cam,x_of_target,y_of_target):
-    distance=(distance_to_cam**2 -height_of_cam**2)**(1/2)
-    angle=math.degrees(math.asin(((distance_to_cam) * (math.sin((x_of_target-640)*((math.radians(constants.fov_x))/1280)))/distance)%1))
+    distance_to_bot=(distance_to_cam**2 -height_of_cam**2)**(1/2)
+    # angle=math.degrees(math.asin(((distance_to_cam) * (math.sin((x_of_target-640)*((math.radians(constants.fov_x))/1280)))/distance)%1))
+    angle_to_cam=(x_of_target-640)*((math.radians(constants.fov_x))/1280)
+    x_dis_to_bot=distance_to_cam*math.sin(angle_to_cam)
+    angle_to_bot=math.asin(x_dis_to_bot/distance_to_bot)
+
     #cv2.putText(frame,"distance to Bot"+str(distance)+'cm',(x_of_target,y_of_target+30),0,1,(0,0,255),2)
     #cv2.putText(frame,"angle to Bot"+str(angle)+'degree',(x_of_target,y_of_target+60),0,1,(0,0,255),2)
     distance=float(distance)
