@@ -47,9 +47,8 @@ def get_distance_and_angle(height_of_cam,distance_to_cam,x_of_target,y_of_target
 
     #cv2.putText(frame,"distance to Bot"+str(distance)+'cm',(x_of_target,y_of_target+30),0,1,(0,0,255),2)
     #cv2.putText(frame,"angle to Bot"+str(angle)+'degree',(x_of_target,y_of_target+60),0,1,(0,0,255),2)
-    distance=float(distance)
-    angle=float(angle)
-    return distance,angle
+   
+    return distance_to_bot,angle_to_bot
 
 
 def getCorners(convexHull):#second stage dirivitive of all points
