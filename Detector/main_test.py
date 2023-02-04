@@ -16,7 +16,7 @@ while True:
   
     mask1 = f.maskGenerator1(frame)
     contours1=f.findContours(mask1)    
-    contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
+    #contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
         biggest_contour1=f.find_biggest_contour(contours1)
         area1=cv2.contourArea(biggest_contour1) 
