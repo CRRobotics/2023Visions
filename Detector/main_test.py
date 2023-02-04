@@ -25,10 +25,17 @@ while True:
             point_x1,point_y1=center1
             distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
             distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
-            cv2.putText(frame,'distance'+str(distance1)+'cm',(point_x1,point_y1-10),0,1,(0,0,255),2)
-            cv2.putText(frame,'angle'+str(math.degrees((angle1)))+'degree',(point_x1,point_y1+20),0,1,(0,0,255),2)   
 
-            
+
+
+        
+         
+            cv2.putText(frame,f'distance {distance1:.1f} cm',(point_x1,point_y1-10),0,1,(0,0,255),2)
+            #cv2.putText(frame,'distance'+str(distance2)+'cm',(point_x2,point_y2-10),0,1,(0,0,255),2)
+            cv2.putText(frame,f'angle {math.degrees(angle1):.1f} degree',(point_x1,point_y1+20),0,1,(0,0,255),2)
+
+
+          
 
         
     'CONE'
@@ -42,16 +49,22 @@ while True:
             point_x2,point_y2=center2
             distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
             distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
-      
-            cv2.putText(frame,'distance'+str(distance2)+'cm',(point_x2,point_y2-10),0,1,(0,0,255),2)
-            cv2.putText(frame,'angle'+str(math.degrees(angle2))+'degree',(point_x2,point_y2+20),0,1,(0,0,255),2)
+         
+         
+            cv2.putText(frame,f'distance {distance2:.1f} cm',(point_x2,point_y2-10),0,1,(0,0,255),2)
+            #cv2.putText(frame,'distance'+str(distance2)+'cm',(point_x2,point_y2-10),0,1,(0,0,255),2)
+            cv2.putText(frame,f'angle {math.degrees(angle2):.1f} degree',(point_x2,point_y2+20),0,1,(0,0,255),2)
 
 
 
           
 
             
-    cv2.imshow('sdf',frame)
+    cv2.imshow('frame',frame)
+
+    cv2.imshow('cube',mask1)
+
+    cv2.imshow('cone',mask2)
     cv2.waitKey(1)
    
 

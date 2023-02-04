@@ -20,7 +20,7 @@ while True:
             point_x2,point_y2=center2
             distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
             #cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
-            approx = cv2.approxPolyDP(biggest_contour2, 150, True)
+            approx = cv2.approxPolyDP(biggest_contour2, 300, True)
             #cv2.polylines(frame, [approx], True, (0, 255, 255), 2)
 
            # cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
