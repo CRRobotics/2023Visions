@@ -49,7 +49,7 @@ while True:
             angle2=math.radians(angle2)
             trigDistance = getTrigDistanceFromPixel(360-point_y2,distance2)
 
-            f.pushval(nt, 'Detector', "coneDistance", distance2)
+            f.pushval(nt, 'Detector', "coneDistance", trigDistance)
             f.pushval(nt, 'Detector', "coneAngle", angle2)
 
 
