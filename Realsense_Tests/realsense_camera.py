@@ -29,33 +29,33 @@ class RealsenseCamera:
         depth_frame = aligned_frames.get_depth_frame()
         color_frame = aligned_frames.get_color_frame()
         
-        if not depth_frame or not color_frame:
-            # If there is no frame, probably camera not connected, return False
-            print("Error, impossible to get the frame, make sure that the Intel Realsense camera is correctly connected")
-            return False, None, None
+        # if not depth_frame or not color_frame:
+        #     # If there is no frame, probably camera not connected, return False
+        #     print("Error, impossible to get the frame, make sure that the Intel Realsense camera is correctly connected")
+        #     return False, None, None
         
-        # Apply filter to fill the Holes in the depth image
-        spatial = rs.spatial_filter()
-        spatial.set_option(rs.option.holes_fill, 3)
-        filtered_depth = spatial.process(depth_frame)
+        # # Apply filter to fill the Holes in the depth image
+        # spatial = rs.spatial_filter()
+        # spatial.set_option(rs.option.holes_fill, 3)
+        # filtered_depth = spatial.process(depth_frame)
 
-        hole_filling = rs.hole_filling_filter()
-        filled_depth = hole_filling.process(filtered_depth)
-
-        
-        # Create colormap to show the depth of the Objects
-        colorizer = rs.colorizer()
-        depth_colormap = np.asanyarray(colorizer.colorize(filled_depth).get_data())
+        # hole_filling = rs.hole_filling_filter()
+        # filled_depth = hole_filling.process(filtered_depth)
 
         
-        # Convert images to numpy arrays
-        # distance = depth_frame.get_distance(int(50),int(50))
-        # print("distance", distance)
-        depth_image = np.asanyarray(filled_depth.get_data())
-        color_image = np.asanyarray(color_frame.get_data())
+        # # Create colormap to show the depth of the Objects
+        # colorizer = rs.colorizer()
+        # depth_colormap = np.asanyarray(colorizer.colorize(filled_depth).get_data())
 
-        # cv2.imshow("Colormap", depth_colormap)
-        # cv2.imshow("depth img", depth_image)
+        
+        # # Convert images to numpy arrays
+        # # distance = depth_frame.get_distance(int(50),int(50))
+        # # print("distance", distance)
+        # depth_image = np.asanyarray(filled_depth.get_data())
+        # color_image = np.asanyarray(color_frame.get_data())
+
+        # # cv2.imshow("Colormap", depth_colormap)
+        # # cv2.imshow("depth img", depth_image)
 
         return True, color_image, depth_image
     

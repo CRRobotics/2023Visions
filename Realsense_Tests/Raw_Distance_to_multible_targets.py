@@ -25,7 +25,7 @@ while True:
             
                 center1=f.find_center_and_draw_center_and_contour_of_target(frame,contour1)
                 point_x1,point_y1=center1
-                distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
+                distance_cm1= depth_frame.get_distance(point_x1,point_y1)/10#y,x
                 cv2.putText(frame,'{}cm,Cube'.format(distance_cm1),(point_x1,point_y1-10),0,1,(0,0,255),2)
             
     'CONE'
@@ -39,7 +39,7 @@ while True:
             if area2 >= 1600:
                 center2=f.find_center_and_draw_center_and_contour_of_target(frame,contour2)
                 point_x2,point_y2=center2
-                distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
+                distance_cm2= depth_frame.get_distance(point_x2,point_y2)/10#y,x
                 cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
             
                 
