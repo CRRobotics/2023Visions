@@ -34,11 +34,13 @@ def networkConnect() -> any:
 
 
 
-def getTrigDistanceFromPixel(pixel,distance):
-    degreesOverPixels = 42.5/720
+def getTrigDistanceFromPixel(pixelX,pixelY,distance):
+    degreesOverPixelsV = 42.5/720
+    degreesOverPixelsH = 69.4/1280
     cameraOffset = 65
-    angle = math.radians(cameraOffset+(degreesOverPixels*pixel))
-    return distance*math.sin(angle)
+    angleY = math.radians(cameraOffset+(degreesOverPixels*pixelY))
+    angleX = math.radians(degreesOverPixels*pixelX)
+    return ((distance*sin(angleX))**2+(distance*sin(angleY))**2)**1/2
 '''
 get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
 '''
