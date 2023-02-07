@@ -6,7 +6,7 @@ rs=RealsenseCamera()
 import functions as f
 import constants
 import math
-nt = f.networkConnect()
+# nt = f.networkConnect()
 while True:
     ret, frame, depth_frame = rs.get_frame_stream()
    
@@ -28,8 +28,9 @@ while True:
             angle1=math.radians(angle1)
 
 
-            f.pushval(nt,'Detector' , "cubeDiatance", distance1)
-            f.pushval(nt,'Detector' , "cubeAngle", angle1)
+            # f.pushval(nt,'Detector' , "cubeDiatance", distance1)
+            # f.pushval(nt,'Detector' , "cubeAngle", angle1)
+            cv2.putText(frame,'{}cm,Cube'.format(distance_cm1),(point_x1,point_y1-10),0,1,(0,0,255),2)
 
 
             print('{}cm,Cube'.format(distance_cm1),'distance to bot:',distance1,'angle:',angle1)
@@ -49,8 +50,8 @@ while True:
             angle2=math.radians(angle2)
             trigDistance = f.getTrigDistanceFromPixel(640-point_x2,360-point_y2,distance_cm2)
 
-            f.pushval(nt, 'Detector', "coneDistance", trigDistance)
-            f.pushval(nt, 'Detector', "coneAngle", angle2)
+            # f.pushval(nt, 'Detector', "coneDistance", trigDistance)
+            # f.pushval(nt, 'Detector', "coneAngle", angle2)
 
 
             print('{}cm,Cone'.format(distance_cm2),'distance to bot:',distance2,'angle:',angle2)
