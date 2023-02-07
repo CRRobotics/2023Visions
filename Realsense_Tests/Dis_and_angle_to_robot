@@ -1,4 +1,10 @@
 
+
+
+
+'''
+distance and angle is reletive to the point directly under the ground
+'''
 from realsense_camera import *
 import cv2
 #load real sense camera
