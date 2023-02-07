@@ -40,7 +40,8 @@ def getTrigDistanceFromPixel(pixelX,pixelY,distance):
     cameraOffset = 72
     angleY = math.radians(cameraOffset+(degreesOverPixelsV*pixelY))
     angleX = math.radians(degreesOverPixelsH*pixelX)
-    return ((distance*math.sin(angleX))**2+(distance*math.sin(angleY))**2)**1/2
+    return distance*math.sin(angleX)
+    # return ((distance*math.sin(angleX))**2+(distance*math.sin(angleY))**2)**1/2
 '''
 get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
 '''
