@@ -48,7 +48,7 @@ while True:
             distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
             distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
             angle2=math.radians(angle2)
-            trigDistance = f.getTrigDistanceFromPixel(640-point_x2,360-point_y2,distance_cm2)
+            trigDistance = f.getTrigDistanceFromPixel(960-point_x2,540-point_y2,distance_cm2)
 
             # f.pushval(nt, 'Detector', "coneDistance", trigDistance)
             # f.pushval(nt, 'Detector', "coneAngle", angle2)

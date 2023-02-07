@@ -29,14 +29,9 @@ def networkConnect() -> any:
             cond.wait()
     return nt
 
-
-
-
-
-
 def getTrigDistanceFromPixel(pixelX,pixelY,distance):
-    degreesOverPixelsV = 42.5/720
-    degreesOverPixelsH = 69.4/1280
+    degreesOverPixelsV = 42.5/1080
+    degreesOverPixelsH = 69.4/1920
     cameraOffset = 72
     angleY = math.radians(cameraOffset+(degreesOverPixelsV*pixelY))
     angleX = math.radians(degreesOverPixelsH*pixelX)
