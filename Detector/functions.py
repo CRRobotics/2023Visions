@@ -64,7 +64,7 @@ def convertPixelToDepth(pixelX, pixelY):
         return 0
     if(abs(pixelY-resCV) > abs(resCV - YdeltaRES/2)):
         return 0
-    return fixedCRH*pixelX,fixedCRV*pixelY
+    return (fovCH/fixedCRH)*pixelX,(fovCV/fixedCRV)*pixelY
     
 
 
