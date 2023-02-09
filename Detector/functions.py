@@ -53,12 +53,10 @@ def convertPixelToDepth(pixelX, pixelY):
     resCH=1920
     XdeltaRES=resCH-resDH
     YdeltaRES=resCV-resDV
-    dpiDV=fovDV/resDV
-    dpiDH=fovDH/resDH
-    dpiCV=fovCV/resCV
-    dpiCH=fovCH/resCH
-    fixedCRH=resCH-dpiCH*XdeltaRES
-    fixedCRV=resCV-dpiCV*YdeltaRES
+    dpiCV=resCV/fovCV
+    dpiCH=resCH/fovCH
+    fixedCRH=resCH-(dpiCH*XdeltaFOV)
+    fixedCRV=resCV-(dpiCV*YdeltaFOV)
     if(abs(pixelX-resCH) > abs(resCH - XdeltaRES/2)):
         #then the pixel needs to be cut
         return 0
