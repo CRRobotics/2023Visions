@@ -30,12 +30,42 @@ def networkConnect() -> any:
     return nt
 
 def getTrigDistanceFromPixel(pixelX,pixelY,distance):
+    #42.5/
     degreesOverPixelsV = 42.5/1080
     degreesOverPixelsH = 69.4/1920
     cameraOffset = 72
     angleY = math.radians(cameraOffset+(degreesOverPixelsV*pixelY))
     angleX = math.radians(degreesOverPixelsH*pixelX)
-    return distance*math.sin(angleX)
+    distX = distance*math.sin(angleX)
+    distY = distance*math.sin(angleY)
+    return math.sqrt((distX*distX)+(distY*distY))
+def convertPixelToDepth(pixelX, pixelY):
+    #D stands for depth, c for color, h for horizontal, v for verticle
+    fovDV=58 
+    fovDH=87
+    fovCV=42.5
+    fovCH=69.4
+    XdeltaFOV=fovCH-fovDH
+    YdeltaFOV=fovCV-fovDV
+    resDV=720
+    resDH=1280
+    resCV=1080
+    resCH=1920
+    XdeltaRES=resCH-resDH
+    YdeltaRES=resCV-resDV
+    dpiCV=resCV/fovCV
+    dpiCH=resCH/fovCH
+    fixedCRH=resCH-(dpiCH*XdeltaFOV)
+    fixedCRV=resCV-(dpiCV*YdeltaFOV)
+    if(abs(pixelX-resCH) > abs(resCH - XdeltaRES/2)):
+        #then the pixel needs to be cut
+        return 0
+    if(abs(pixelY-resCV) > abs(resCV - YdeltaRES/2)):
+        return 0
+    return (fovCH/fixedCRH)*pixelX,(fovCV/fixedCRV)*pixelY
+    
+
+
     # return ((distance*math.sin(angleX))**2+(distance*math.sin(angleY))**2)**1/2
 '''
 get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
