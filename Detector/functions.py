@@ -29,16 +29,13 @@ def networkConnect() -> any:
             cond.wait()
     return nt
 
-def getTrigDistanceFromPixel(pixelX,pixelY,distance):
+def getTrigDistanceFromPixel(pixelX,distance):
     #42.5/
     degreesOverPixelsV = 42.5/1080
     degreesOverPixelsH = 69.4/1920
     cameraOffset = 72
-    angleY = math.radians(cameraOffset+(degreesOverPixelsV*pixelY))
     angleX = math.radians(degreesOverPixelsH*pixelX)
-    distX = distance*math.sin(angleX)
-    distY = distance*math.sin(angleY)
-    return math.sqrt((distX*distX)+(distY*distY))
+    return d*math.cos(angleX)
 def convertPixelToDepth(pixelX, pixelY):
     #D stands for depth, c for color, h for horizontal, v for verticle
     fovDV=58 
@@ -55,6 +52,7 @@ def convertPixelToDepth(pixelX, pixelY):
     YdeltaRES=resCV-resDV
     dpiCV=resCV/fovCV
     dpiCH=resCH/fovCH
+
     fixedCRH=resCH-(dpiCH*XdeltaFOV)
     fixedCRV=resCV-(dpiCV*YdeltaFOV)
     if(abs(pixelX-resCH) > abs(resCH - XdeltaRES/2)):
@@ -62,7 +60,7 @@ def convertPixelToDepth(pixelX, pixelY):
         return 0
     if(abs(pixelY-resCV) > abs(resCV - YdeltaRES/2)):
         return 0
-    return (fovCH/fixedCRH)*pixelX,(fovCV/fixedCRV)*pixelY
+    return (fovDH/fixedCRH)*pixelX,(fovDV/fixedCRV)*pixelY
     
 
 
