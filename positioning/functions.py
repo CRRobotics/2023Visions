@@ -246,6 +246,10 @@ def getRobotVals(ay, cameraid, px, py):
 def waitForCam(path):
     while True:
         cap = cv.VideoCapture(path)
+        cap:cv.VideoCapture
+        cap.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+        cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+        cap.set(cv.CAP_PROP_FPS, 20)
         if cap.isOpened():
             print("open")
             return cap
