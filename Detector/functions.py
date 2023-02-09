@@ -28,7 +28,12 @@ def networkConnect() -> any:
         if not notified[0]:
             cond.wait()
     return nt
-
+def getGroundDistanceFromPixel(pixel,depth):
+    w=1
+    x=w*pixel/1080
+    m=pi/2
+    y=depth*math.sin((pi/2)-m)
+    return(math.sqrt(x*x+y*y))
 def getTrigDistanceFromPixel(pixelX,distance):
     #42.5/
     degreesOverPixelsV = 42.5/1080
