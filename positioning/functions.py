@@ -76,6 +76,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
         objectpoints = []
         cornerpoints = []
         tagcounter = 0
+        margins = []
 
         for detection in detections:
             if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4:
@@ -102,6 +103,8 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
                 for corner in detection["lb-rb-rt-lt"]:
                     cornerpoints.append(corner)
+                
+                margins.append(detection["margin"])
 
         if objectpoints and cornerpoints:
 
@@ -174,6 +177,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
             toreturn["angle"] = robotheta
             toreturn["tags"] = tagcounter
+            toreturn["margins"] = margins
 
             rvx, rvy, rvz = rvec
 
@@ -190,7 +194,8 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
     return {
         "pos": (63900,63900,63900),
         "angle":63900,
-        "tags":0
+        "tags":0,
+        "margins":0
     }
 def mergeCams(vecsdicts):
     # Get positions, rotations, and number of tags each one sees
@@ -254,7 +259,7 @@ def waitForCam(path):
             print("open")
             return cap
         else:
-            print("not open")
+            # print("not open")
             sleep(0.001)
 
 def logStuff(camid, rx, ry, rt, time):
