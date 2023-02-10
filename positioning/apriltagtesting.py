@@ -52,7 +52,7 @@ def process_frame(cameraid, path, nt, headless = False):
             # pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
             # pushval(nt, f"{cameraid}", "time", timezz)
             # pushval(nt, f"{cameraid}", "confidence", margins)
-        if not headless: cv.imshow(f"CAMID{cameraid}:", frame1)
+        if not headless: cv.imshow(f"CAMID{cameraid}:", shrinkFrame(frame1))
         cv.waitKey(1)
 
         # ts = time()

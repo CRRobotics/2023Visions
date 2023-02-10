@@ -111,10 +111,6 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             objectpoints = np.array(objectpoints)
             cornerpoints = np.array(cornerpoints)
 
-            # print("objectpoints:")
-            # print(objectpoints)
-            # print("cornerpoints:")       
-            # print(cornerpoints)
             mmat, rvec, tvec = cv.solvePnP(
                 objectpoints, 
                 cornerpoints,
@@ -124,7 +120,6 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
             tvec = (np.array(tvec))
             rvec = (np.array(rvec))   
-            # print(math.degrees(rvec))
 
             rotationmatrix, _ = cv.Rodrigues(rvec)
 
@@ -135,8 +130,6 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             _, _, _, _, _, rmatZ, euler_angles_r = cv.decomposeProjectionMatrix(p)
 
             euler_angles_r = -euler_angles_r
-            # print(ztheta)
-            # print(rmatZ)
 
             # Get coordinates of rotated point on unit sphere. We want to project it onto the x-y axis
             pointCoords = np.dot(rotationmatrix.T, np.array([[1],[0],[0]]))
@@ -151,17 +144,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
             ztheta -= 90
             if ztheta < 0: ztheta += 360
-            # print(ztheta)
 
-            # def mod_but_with_decimals(x, y):
-            #     return x - math.floor(x / y) * y
-
-            # if pointX >= 0:
-            #     ztheta = mod_but_with_decimals(math.degrees(math.atan(pointY / pointX)), 360)
-            # else:
-            #     ztheta = 180 + math.degrees(math.atan(pointY / pointX))
-
-            # ztheta -= 90
 
             ax, ay, az = euler_angles_r
 
@@ -185,10 +168,10 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             rvy = math.degrees(rvy[0])
             rvz = math.degrees(rvz[0])
 
-            cv.putText(frame, " PX: %.4f  PY: %.4f  PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            cv.putText(frame, " PX: %.4f  PY: %.4f  PZ: %.4f"%(px, py, pz), (50, 100), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255))
             # cv.putText(frame, " AX: %.4f  AY: %.4f  AZ: %.4f"%(ax, ay, az), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
-            cv.putText(frame, " ZTHETA: %.4f"%(ztheta), (50, 50), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
-            cv.putText(frame, " RX: %.4f  RY: %.4f RTHETA: %.4f"%(rx, ry, math.degrees(robotheta)), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
+            cv.putText(frame, " ZTHETA: %.4f"%(ztheta), (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255))
+            cv.putText(frame, " RX: %.4f  RY: %.4f RTHETA: %.4f"%(rx, ry, math.degrees(robotheta)), (50, 150), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255))
             # cv.putText(frame, "RVX: %.4f RVY: %.4f RVZ: %.4f"%(rvx, rvy, rvz), (50, 150), cv.FONT_HERSHEY_SIMPLEX, .5, (255, 0, 255))
             return toreturn
     return {
@@ -268,6 +251,11 @@ def logStuff(camid, rx, ry, rt, time):
         c.writerow(
             [camid, rx, ry, rt, time]
         )
+
+def shrinkFrame(frame):
+    kernel = np.ones((2,2),np.float32)/4
+    dst = cv.filter2D(frame,-1,kernel)
+    return dst[::2,::2]
 
 # def graph():
 #     if len(constants.RX_LOG) > 1000:
