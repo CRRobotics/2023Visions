@@ -54,9 +54,7 @@ public class JeVoisInterface
 
     // Most recently seen target information
     // private boolean tgtVisible = false;
-    private double[] positionHub;
-    private double[] positionRed;
-    private double[] positionBlue;
+    private double[] cone_angle = {0.0};
     // private double  tgtRange = 0;
     private double tgtTime = 0;
     
@@ -77,9 +75,7 @@ public class JeVoisInterface
     public JeVoisInterface() {
         this(false); //Default - stream disabled, just run serial.
 
-        positionHub = new double[2];
-        positionRed = new double[2];
-        positionBlue = new double[2]; 
+        angle  = 0;
     }
 
     /**
@@ -590,15 +586,11 @@ public class JeVoisInterface
         // Four performance numbers are:
         // JV_framerate, JV_cpuload, JV_cputemp, JV_pipelinedelay
 
-		final int NTOK = 11;
-		final int TOK_FRAME_CNT = 0;
-        final int TOK_HUB = 1;          // 1 and 2 are hub d and phi
-        final int TOK_RED = 3;
-        final int TOK_BLUE = 5;
-        final int TOK_JV_LOAD = 7;
-        final int TOK_JV_CPUTEMP = 8;
-        final int TOK_JV_FRATE = 9;
-        final int TOK_JV_PIPEDELAY = 10;
+
+		final int F_COUNT = 0;
+        final int C_ANGLE = 1;
+        final int CPU_LOAD = 2;
+        final int CPU_TEMP = 3;
 
         //Split string into many substrings, presuming those strings are separated by commas
         String[] tokens = pkt.split(PKT_SEP);
@@ -614,18 +606,16 @@ public class JeVoisInterface
         try 
         {
             //Use Java built-in double to string conversion on most of the rest
-            parsePosition(tokens, TOK_HUB, positionHub);
-            parsePosition(tokens, TOK_RED, positionRed);
-            parsePosition(tokens, TOK_BLUE, positionBlue);
 
-            tgtTime  = rx_Time - Double.parseDouble(tokens[TOK_JV_PIPEDELAY])/1000000.0;
+
+            // tgtTime  = rx_Time - Double.parseDouble(tokens[TOK_JV_PIPEDELAY])/1000000.0;
+
+            cone_angle[0] = Double.parseDouble(tokens[C_ANGLE])
+            frame_count = Double.parseDouble(tokens[F_COUNT])
             jeVoisCpuTempC   = Double.parseDouble(tokens[TOK_JV_CPUTEMP]);
             jeVoisCpuLoadPct = Double.parseDouble(tokens[TOK_JV_LOAD]);
 
-            // sd.putNumberArray("positionHub", positionHub);
-            // sd.putNumberArray("positionRed", positionRed);
-            // sd.putNumberArray("positionBlue", positionBlue);
-            
+            sd.putNumberArray("angle", cone_angle[0]);
         } catch (Exception e) {
             DriverStation.reportError("Unhandled exception while parsing Vision packet: " + e.getMessage() + "\n" + e.getStackTrace(), false);
             return -1;
@@ -641,9 +631,8 @@ public class JeVoisInterface
     {
         public void run()
         {
-            // NetworkTableInstance inst = NetworkTableInstance.getDefault();
-            // NetworkTable sd = inst.getTable("Visions");
-            // NetworkTableEntry positionHub = sd.getEntry("positionHub");
+            NetworkTableInstance inst = NetworkTableInstance.getDefault();
+            NetworkTable sd = inst.getTable("Visions");
         	while(!Thread.interrupted())
             {
         		backgroundUpdate();   
