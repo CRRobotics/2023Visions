@@ -11,8 +11,8 @@ higher_yellow=np.array([40,255,255])
 lower_purple=np.array([0,0,0])
 higher_purple=np.array([180,255,255])
 '''
-cam_height=0.81 # in meters
-cam_mount_angle=35
+cam_height=0.95 # in meters
+cam_mount_angle=33
 
 
 #functions
@@ -118,13 +118,20 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     
 def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
     diagnal_dis=(dy**2+dz**2)**0.5
-    small_angle=math.atan(dy/dz)
+    small_angle=math.atan(abs(dy)/dz)
     mountAngle=math.radians(mountAngle)
-    remain_angle=math.pi/2 - mountAngle - small_angle
+    if dy <= 0:
+        remain_angle=math.pi/2 - mountAngle - small_angle
+    else:
+        remain_angle=math.pi/2 - mountAngle + small_angle
     z = diagnal_dis * math.sin(remain_angle)
     y = camHeight - diagnal_dis * math.cos(remain_angle)
     x = dx
     return x,y,z
+def correct_dis(cam_dis):
+    real_dis = (1/0.359)*cam_dis - 69/0.359
+    return real_dis
+    
 
 
 
@@ -201,7 +208,7 @@ while True:
     if len(contours2) >0:
         for contour2 in contours2:
             area2=cv2.contourArea(contour2) 
-            if area2 >= 1600:
+            if area2 >= 160:
                 center2=find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                 point_x2,point_y2=center2
             
@@ -216,7 +223,7 @@ while True:
                
 
     cv2.imshow("color_image", color_image)
-    key = cv2.waitKey(1)
+    key = cv2.waitKey(200)
     # Press esc or 'q' to close the image window
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()
