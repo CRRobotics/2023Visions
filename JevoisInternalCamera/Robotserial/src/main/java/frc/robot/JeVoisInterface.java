@@ -120,10 +120,10 @@ public class JeVoisInterface
         }
         
         //Ensure the JeVois is starting with the stream off.
-        stopDataOnlyStream();
+        //stopDataOnlyStream();
 
-        setCameraStreamActive(useUSBStream);
-        start();
+        //setCameraStreamActive(useUSBStream);
+        //start();
 
         //Start listening for packets
         packetListenerThread.setDaemon(true);
@@ -138,16 +138,19 @@ public class JeVoisInterface
             startCameraStream(); 
             System.out.println("Started camera stream\n");
         } else {
-            startDataOnlyStream();
-            System.out.println("Started HEADLESS stream\n");
+            //startDataOnlyStream();
+            System.out.println("Skipping start; Started HEADLESS stream\n");
         }
     }
 
     public void stop(){
+        System.out.println("About to stop stream" + broadcastUSBCam);
+
         if(broadcastUSBCam){
             //Start streaming the JeVois via webcam
             //This auto-starts the serial stream
             stopCameraStream(); 
+            
         } else {
             stopDataOnlyStream();
         }
