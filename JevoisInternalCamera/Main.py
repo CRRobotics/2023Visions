@@ -43,6 +43,17 @@ def maskGenerator2(img,lower_color,higher_color):
     maskab = cv2.bitwise_and(maska, maskb)
     return maskab
 
+def maskGenerator3(img, lower_color, higher_color): #Elijah version
+    img==cv2.blur(img, (5,5))
+    b,g,r=cv2.split(img)
+    _, maskr = cv2.threshold(r, 155, 255, cv2.THRESH_BINARY)
+    _, maskg = cv2.threshold(g, 155, 255, cv2.THRESH_BINARY)
+    masky = cv2.bitwise_and(maskr, maskg)
+    _, maskb = cv2.threshold(g, 100, 255, cv2.THRESH_BINARY)
+    maskb = cv2.bitwise_not(maskb)
+    mask = cv2.bitwise_and(masky, maskb)
+    return mask
+
 def findContours(mask):
     contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
