@@ -2,6 +2,7 @@ import libjevois as jevois
 import cv2
 import numpy as np
 import math
+import re
 
 ## Tell Orientation of Cones
 #
@@ -72,25 +73,33 @@ def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
         center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
         cv2.circle(frame, center, 3, (0, 0, 255), -1)
         return center
+    
+
+
+
 class Orientation:
     # ###################################################################################################
     ## Constructor
     def __init__(self):
         # Instantiate a JeVois Timer to measure our processing framerate:
         self.timer = jevois.Timer("processing timer", 100, jevois.LOG_INFO)
-        
-    # ###################################################################################################
-    ## Process function with USB output
-    def process(self, inframe, outframe):
+        self.CPULoad_pct = "0"
+        self.CPUTemp_C = "0"
+        self.pattern = re.compile('([0-9]*\.[0-9]+|[0-9]+) fps, ([0-9]*\.[0-9]+|[0-9]+)% CPU, ([0-9]*\.[0-9]+|[0-9]+)C,')
+        self.frame = 0
+        self.angle_final = 0
 
+
+    def processNoUSB(self, inframe):
+        self.common(inframe)
+
+    def common(self, inframe):
         frame = inframe.getCvBGR()
         
         # Start measuring image processing time (NOTE: does not account for input conversion time):
             
         self.timer.start()
         
-    
-
 
         mask2=maskGenerator2(frame,lower_yellow,higher_yellow)
         contours2=findContours(mask2) 
@@ -142,11 +151,11 @@ class Orientation:
                     lower_x=point_x2
                     lower_y=point_y2-dis_center_to_target
                     dis_target_to_lower=((lower_x-x_final)**2+(lower_y-y_final)**2)**(1/2)
-                    angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
+                    self.angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
                     if x_final<point_x2:
-                        angle_final=(-1)*angle_final
+                        self.angle_final=(-1)*self.angle_final
                     # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
-                    cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
+                    cv2.putText(frame,str(math.degrees(self.angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
         outimg = frame
         # Write a title:
         cv2.putText(outimg, "JeVois Orientation", (3, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
@@ -156,7 +165,34 @@ class Orientation:
         height = outimg.shape[0]
         width = outimg.shape[1]
         cv2.putText(outimg, fps, (3, height - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
+
+
+        results = self.pattern.match(self.timer.stop())
+        if(results is not None):
+            self.framerate_fps = results.group(1)
+            self.CPULoad_pct = results.group(2)
+            self.CPUTemp_C = results.group(3)
+
         
+        serialstr = "{%d %.2f %s %s}"%(
+            self.frame,
+            self.angle_final,
+            self.CPULoad_pct,
+            self.CPUTemp_C
+        )
+
+        jevois.sendSerial(serialstr)
+
+        self.frame += 1
+        self.frame %= 999
+
+        return self.angle_final, outimg
+
+
+    # ###################################################################################################
+    ## Process function with USB output
+    def process(self, inframe, outframe):
+        _, outimg = self.common(inframe)
         # Convert our output image to video output format and send to host over USB:
         outframe.sendCv(outimg)
         
