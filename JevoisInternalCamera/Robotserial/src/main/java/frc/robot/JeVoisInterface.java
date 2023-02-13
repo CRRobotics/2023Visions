@@ -595,7 +595,9 @@ public class JeVoisInterface
 
         //Split string into many substrings, presuming those strings are separated by commas
         String[] tokens = pkt.split(PKT_SEP);
-        System.out.println(tokens);
+        for (String x:tokens) {
+            System.out.println(x);
+        }
         //Check there were enough substrings found
         if (tokens.length < 4) {
             DriverStation.reportError("Malformed vision packet. Expected " + Integer.toString(4) + 
@@ -615,7 +617,7 @@ public class JeVoisInterface
             double frame_count = Double.parseDouble(tokens[F_COUNT]);
             jeVoisCpuTempC   = Double.parseDouble(tokens[CPU_TEMP]);
             jeVoisCpuLoadPct = Double.parseDouble(tokens[CPU_LOAD]);
-            System.out.println(cone_angle[0]);
+            System.out.println("cone angle:"+cone_angle[0]);
             // NetworkTableInstance nt = NetworkTableInstance.getDefault();
             // nt.getTable("Visions").putValue("angle", new NetworkTableEntry(nt, ))("angle", cone_angle[0]);
         } catch (Exception e) {
