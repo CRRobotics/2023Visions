@@ -6,6 +6,28 @@ import math
 import threading
 
 from networktables import NetworkTables as nt
+def differentiateObject(depthMap, xRange,yRange,threshold):
+    tempArr=np.array([xRange,yRange], dtype=bool)
+    pixOffset = 5
+    BoundPix=False
+    perimeter=0
+    for x in range(0,xRange):
+        for y in range(0,yRange):
+            if depthMap[x,y]-depthMap[x,(y-pixOffset)]>threshold:
+                boundPix=True
+            if depthMap[x,y]-depthMap[x,(y+pixOffset)]>threshold:
+                boundPix=True
+            if depthMap[x,y]-depthMap[(x-pixOffset),y]>threshold:
+                boundPix=True
+            if depthMap[x,y]-depthMap[(x+pixOffset),y]>threshold:
+                boundPix=True
+            if boundPix:
+                tempArr[x,y] = True
+                perimeter+=1
+
+    return tempArr
+    # return (perimeter>((xRange+yRange)))
+        
 def pushval(networkinstance, tablename:str, valuename, value:float):
     table = networkinstance.getTable(tablename)
     table.putNumber(valuename, value)
