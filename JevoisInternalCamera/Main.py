@@ -201,3 +201,8 @@ class Orientation:
         # Convert our output image to video output format and send to host over USB:
         outframe.sendCv(outimg)
         
+'''Pleaes send the value of angle_final to the bot'''
+'''it is in degrees of where the tip of the cone is pointing twards'''
+'''tip of cone pointing up is 0'''
+'''CW is positive'''
+'''CCW is negetive'''
