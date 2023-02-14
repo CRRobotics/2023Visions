@@ -12,8 +12,8 @@ lower_purple=np.array([0,0,0])
 higher_purple=np.array([180,255,255])
 '''
 cam_height=0.95 # in meters
-cam_mount_angle=33
-
+cam_mount_angle=35
+#69 x 42 fov
 
 #functions
 def maskGenerator1(img):#for cube
@@ -86,34 +86,8 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     intrinsics = rs.video_stream_profile(color_frame.profile).get_intrinsics()
     point_2d = np.array([x, y]) # Example pixel position
     point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
-    # intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
-    # point_2d = np.array([x,y]) # Use the center of the frame as an example
-    # point_2d = np.array([point_2d[0] / intrinsics.width, point_2d[1] / intrinsics.height], dtype=np.float32)
-
-    # # Check if the point has a corresponding depth value
-    # if not np.isnan(depth_frame.get_distance(point_2d[0], point_2d[1])):
-    # # Project the 2D point to 3D
-    #     point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
-
-    #     # Get the extrinsic parameters of the color and depth cameras
-    #     extrinsics = depth_frame.get_profile().get_extrinsics_to(color_frame.get_profile())
-
-    #     # Transform the 3D point from the color camera frame to the depth camera frame
-    #     point_3d = rs.rs2_transform_point_to_point(extrinsics, point_3d)
     dx,dy,dz = point_3d
-
-
-        # # Deproject the 3D point back to the depth image plane
-        # point_2d = rs.rs2_project_point_to_pixel(intrinsics, point_3d)
-
-        # # Convert the normalized image plane coordinates back to pixel coordinates
-        
-        # point_2d = [int(point_2d[0] * intrinsics.width), int(point_2d[1] * intrinsics.height)]
-
-        # # Get the distance to the projected point on the depth frame
-        # depth = depth_frame.get_distance(point_2d[0], point_2d[1])
-        # dx ,dy, dz = rs.rs2_deproject_pixel_to_point(intrinsics, [point_2d[0], point_2d[1]], depth)
-    return dx ,-1*dy, dz 
+    return -1*dy ,-1*dx, dz  # x is right, y is up, z is front.
     
     
 def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
@@ -186,16 +160,16 @@ while True:
     if len(contours1) >0:
         for contour1 in contours1:
             area1=cv2.contourArea(contour1) 
-            if area1>=1600:
+            if area1>=16:
                 center1=find_center_and_draw_center_and_contour_of_target(color_image,contour1)
                 point_x1,point_y1=center1
             
                 dx1,dy1,dz1 = getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
                 if dz1 != 0:
                     x1,y1,z1=getCordinatesOfTarget_Bot(dx1,dy1,dz1,cam_mount_angle, cam_height)
-                    cv2.putText(color_image, str(int(x1*100))+' '+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                # else:
-                #     cv2.putText(color_image, '0', (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    
+             
 
 
              
@@ -208,22 +182,24 @@ while True:
     if len(contours2) >0:
         for contour2 in contours2:
             area2=cv2.contourArea(contour2) 
-            if area2 >= 160:
+            if area2 >= 16:
                 center2=find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                 point_x2,point_y2=center2
             
                 dx2,dy2,dz2 = getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
                 if dz2 != 0:
                     x2,y2,z2=getCordinatesOfTarget_Bot(dx2,dy2,dz2,cam_mount_angle, cam_height)
-                    cv2.putText(color_image, str(int(x2*100))+' '+str(int(z2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                # else: 
-                #     cv2.putText(color_image, '0', (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                
 
 
                
+    b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
+   
 
-    cv2.imshow("color_image", color_image)
-    key = cv2.waitKey(200)
+    cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
+    cv2.imshow("color_image", b)
+    key = cv2.waitKey(1)
     # Press esc or 'q' to close the image window
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()
