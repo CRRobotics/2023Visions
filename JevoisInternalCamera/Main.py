@@ -27,7 +27,7 @@ higher_yellow=np.array([40,255,255])
 def maskGenerator1(img):#for cube
     img=cv2.blur(img, (5,5)) 
     #img= cv2.GaussianBlur(img, (15, 15), 0)
-    b,g,r=cv2.split(img)     
+    b,g,r =cv2.split(img)     
     diff = cv2.subtract(b,g)
     ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
@@ -44,6 +44,7 @@ def maskGenerator2(img,lower_color,higher_color):
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(g, b)
     ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     # 
     # maska=cv2.dilate(maska,kernel1,iterations=5) 
@@ -52,13 +53,28 @@ def maskGenerator2(img,lower_color,higher_color):
     maska=cv2.dilate(maska,kernel1,iterations=3) 
     
 
-    #hsv double check
-    # img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    # maskb=cv2.inRange(img,lower_color,higher_color) 
-    # # maskb=cv2.dilate(maskb,kernel1,iterations=1)
-    # maskab = cv2.bitwise_and(maska, maskb)
-    # return maskab
+    # hsv double check
+    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    maskb=cv2.inRange(img,lower_color,higher_color) 
+    # maskb=cv2.dilate(maskb,kernel1,iterations=1)
+    maskab = cv2.bitwise_and(maska, maskb)
+    return maskab
     return maska
+
+def circularmask(img):
+    radius2 = 175
+    ww, hh, _ = img.shape
+    xc = hh // 2
+    yc = ww // 2
+
+    print(xc, yc)
+    
+    mask2 = np.zeros_like(img)
+    mask = cv2.circle(mask2, (xc,yc), radius2, (255,255,255), -1)
+    dst = cv2.bitwise_and(img, mask2)
+    return dst
+
+
 
 # def maskGenerator3(img):
 #     img==cv2.blur(img, (5,5))
@@ -111,7 +127,7 @@ class Orientation:
     def commonProcess(self, inframe, outframe):
 
         frame = inframe.getCvBGR()
-        
+        frame = circularmask(frame)
         # Start measuring image processing time (NOTE: does not account for input conversion time):
             
         self.timer.start()
@@ -142,7 +158,7 @@ class Orientation:
                 center2=find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
                 point_x2,point_y2=center2
                 #cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
-                approx = cv2.approxPolyDP(biggest_contour2, 50, True)
+                approx = cv2.approxPolyDP(biggest_contour2, 150, True)
                 cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
                 cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
                 if len(approx)==3:
