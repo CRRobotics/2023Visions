@@ -105,7 +105,72 @@ def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
 def correct_dis(cam_dis):
     real_dis = (1/0.359)*cam_dis - 69/0.359
     return real_dis
-    
+
+'''prototypes'''
+
+
+'''get av coordinates of center of target, averaging the cords around it'''
+def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
+    top_left_x = center_x -dimension
+    top_left_y = center_x -dimension
+    list_of_x=[]
+    list_of_z=[]
+    list_of_y=[]
+
+    list_of_x2=[]#used to remove 0
+    list_of_z2=[]
+    list_of_y2=[]
+    #put in values
+    for a in range(0,2*dimension+1):
+        for b in range(0,2*dimension+1):
+            dx,dy,dz = getCordinatesOfTarget_Cam(b,a, depth_frame, color_frame)
+            list_of_x.append(dx)
+            list_of_z.append(dz)
+            list_of_y.append(dy)
+
+    #start remove all 0 in the list
+    for i in list_of_x:
+        if i != 0:
+            list_of_x2.append(i)
+    for i in list_of_z:
+        if i !=0 :
+            list_of_z2.append(i)
+    for i in list_of_y:
+        if i !=0 :
+            list_of_y2.append(i)
+    x_av = 0
+    z_av =0
+    y_av =0
+    for i in list_of_x2:
+        x_av+=i
+    for i in list_of_z2:
+        z_av+=i
+    for i in list_of_y2:
+        y_av+=i
+    x_av/=len(list_of_x2)
+    z_av/=len(list_of_z2)
+    y_av/=len(list_of_y2)
+    return x_av,y_av,z_av
+'''get the point on the ground'''
+
+def get_ground_point(frame,contour):
+    cv2.drawContours(frame,[contour],0,(255,0,255),2)
+    points_array=contour.tolist()
+    points_tuple=[]#position of convex points
+    for i in points_array:
+        for c in i:
+            c=tuple(c)
+            points_tuple.append(c)
+    biggest_y=0
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if y >= biggest_y:
+            biggest_y=y
+            indexer=i
+    point=points_tuple[indexer]
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    return point#position of the point with the biggest y value.
 
 
 
