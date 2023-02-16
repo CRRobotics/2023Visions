@@ -2,7 +2,7 @@ import libjevois as jevois
 import cv2
 import numpy as np
 import math
-
+import re
 ## Tell Orientation of Cones
 #
 # Add some description of your module here.
@@ -111,16 +111,24 @@ class Orientation:
     def __init__(self):
         # Instantiate a JeVois Timer to measure our processing framerate:
         self.timer = jevois.Timer("processing timer", 100, jevois.LOG_INFO)
-        
+        self.CPULoad_pct = "0"
+        self.CPUTemp_C = "0"
+        self.pattern = re.compile('([0-9]*\.[0-9]+|[0-9]+) fps, ([0-9]*\.[0-9]+|[0-9]+)% CPU, ([0-9]*\.[0-9]+|[0-9]+)C,')
+        self.frame = 0
+        self.angle_final = 0
+
+
     # ###################################################################################################
     def processNoUSB(self, inframe):
         self.commonProcess(inframe=inframe)
         
+
     # ###################################################################################################
     ## Process function with USB output
     def process(self, inframe, outframe):
-        self.commonProcess(inframe=inframe, outframe=outframe)
-    
+        _, outimg = self.commonProcess(inframe)
+        outframe.sendCv(outimg)
+
    
         
     ## Process function with USB output
@@ -132,7 +140,6 @@ class Orientation:
             
         self.timer.start()
         
-    
 
         '''
         Cube
@@ -158,7 +165,7 @@ class Orientation:
                 center2=find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
                 point_x2,point_y2=center2
                 #cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
-                approx = cv2.approxPolyDP(biggest_contour2, 150, True)
+                approx = cv2.approxPolyDP(biggest_contour2, 100, True)
                 cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
                 cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
                 if len(approx)==3:
@@ -204,6 +211,8 @@ class Orientation:
                         angle_final=(-1)*angle_final
                     # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
                     cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
+
+    
         outimg = frame
         # Write a title:
         cv2.putText(outimg, "JeVois Orientation", (3, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
@@ -215,7 +224,26 @@ class Orientation:
         cv2.putText(outimg, fps, (3, height - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
         
         # Convert our output image to video output format and send to host over USB:
-        outframe.sendCv(outimg)
+        results = self.pattern.match(self.timer.stop())
+        if(results is not None):
+            self.framerate_fps = results.group(1)
+            self.CPULoad_pct = results.group(2)
+            self.CPUTemp_C = results.group(3)
+
+        
+        serialstr = "{%d %.2f %s %s}"%(
+            self.frame,
+            self.angle_final,
+            self.CPULoad_pct,
+            self.CPUTemp_C
+        )
+
+        jevois.sendSerial(serialstr)
+
+        self.frame += 1
+        self.frame %= 999
+
+        return self.angle_final, outimg
         
 '''Pleaes send the value of angle_final to the bot'''
 '''it is in degrees of where the tip of the cone is pointing twards'''
