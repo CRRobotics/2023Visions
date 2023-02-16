@@ -206,9 +206,9 @@ class Orientation:
                     lower_x=point_x2
                     lower_y=point_y2-dis_center_to_target
                     dis_target_to_lower=((lower_x-x_final)**2+(lower_y-y_final)**2)**(1/2)
-                    angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
+                    self.angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
                     if x_final<point_x2:
-                        angle_final=(-1)*angle_final
+                        self.angle_final=(-1)*self.angle_final
                     # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
                     cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
 
