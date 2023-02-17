@@ -165,7 +165,8 @@ class Orientation:
                 center2=find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
                 point_x2,point_y2=center2
                 #cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
-                approx = cv2.approxPolyDP(biggest_contour2, 100, True)
+                epsilon = 0.1 * cv2.arcLength(biggest_contour2, True)
+                approx = cv2.approxPolyDP(biggest_contour2, epsilon, True)
                 cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
                 cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
                 if len(approx)==3:
