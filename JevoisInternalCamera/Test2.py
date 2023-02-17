@@ -1,13 +1,3 @@
-"""
-This is Rocky's Prototype
-for another approach for getting
-the tip of the cone
-Please kindly don't change anything
-"""
-
-
-
-
 import libjevois as jevois
 import cv2
 import numpy as np
@@ -115,6 +105,29 @@ def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
         center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
         cv2.circle(frame, center, 3, (0, 0, 255), -1)
         return center
+    
+'''prototype'''
+def angle_between(p1, p2, p3):
+    """Calculate the angle between three points in radians."""
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+    a = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+    b = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+    c = math.sqrt((x3-x1)**2 + (y3-y1)**2)
+    return math.acos((a**2 + b**2 - c**2) / (2 * a * b))
+
+def smallest_angle_vertex(vertices):
+    """Find the vertex with the smallest angle in a polygon."""
+    angles = []
+    for i in range(len(vertices)):
+        p1 = vertices[i-1]
+        p2 = vertices[i]
+        p3 = vertices[(i+1) % len(vertices)]
+        angles.append(angle_between(p1, p2, p3))
+    min_angle = min(angles)
+    min_index = angles.index(min_angle)
+    return vertices[min_index]
 class Orientation:
     # ###################################################################################################
     ## Constructor
@@ -179,26 +192,14 @@ class Orientation:
                 approx = cv2.approxPolyDP(biggest_contour2, epsilon, True)
                 cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
                 cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
-                '''
-                Change start
-                '''
-                min_angle = np.inf
-                min_point = None
-                for i in range(len(approx)):
-                    p0 = approx[i][0]
-                    p1 = approx[(i+1)%len(approx)][0]
-                    p2 = approx[(i-1)%len(approx)][0]
-                    v1 = p0 - p1
-                    v2 = p0 - p2
-                    cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-                    angle = np.arccos(cos_angle) * 180 / np.pi
-                    if angle < min_angle:
-                        min_angle = angle
-                        min_point = p0
-                target_point = tuple(min_point)
-                """
-                Change stop
-                """
+            
+                points_array=approx.tolist()
+                points_tuple=[]#position of the three major points
+                for i in points_array:
+                    for c in i:
+                        c=tuple(c)
+                        points_tuple.append(c)
+                target_point = smallest_angle_vertex(points_tuple)
                 cv2.arrowedLine(frame, center2, target_point,(255,0,0), 9) 
                 x_final,y_final=target_point#point_x2,point_y2=center2
                 #difine a lower point
@@ -212,7 +213,7 @@ class Orientation:
                 # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
                 cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
 
-
+    
         outimg = frame
         # Write a title:
         cv2.putText(outimg, "JeVois Orientation", (3, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
