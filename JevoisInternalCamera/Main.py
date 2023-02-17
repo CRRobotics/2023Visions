@@ -126,7 +126,7 @@ class Orientation:
     # ###################################################################################################
     ## Process function with USB output
     def process(self, inframe, outframe):
-        _, outimg = self.commonProcess(inframe)
+        _, outimg = self.commonProcess(inframe, outframe)
         outframe.sendCv(outimg)
 
    

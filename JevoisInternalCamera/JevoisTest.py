@@ -6,7 +6,7 @@
 import cv2 as cv2
 import numpy as np
 def circularmask(img):
-    radius2 = 75
+    radius2 = 160
     ww, hh, _ = img.shape
     xc = hh // 2
     yc = ww // 2

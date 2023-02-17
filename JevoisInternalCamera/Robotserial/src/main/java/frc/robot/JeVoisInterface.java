@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
+import edu.wpi.first.networktables.DoublePublisher;
 
 public class JeVoisInterface 
 {
@@ -22,7 +22,7 @@ public class JeVoisInterface
     // Packet format constants 
     private static final String PKT_START = "{";
     private static final String PKT_END = "}";
-    private static final String PKT_SEP = ",";
+    private static final String PKT_SEP = " ";
     
     // Confgure the camera to stream debug images or not.
     private boolean broadcastUSBCam = false;
@@ -54,7 +54,8 @@ public class JeVoisInterface
 
     // Most recently seen target information
     // private boolean tgtVisible = false;
-    private double[] cone_angle = {0.0};
+    NetworkTable tb;
+    DoublePublisher coneangle;
     // private double  tgtRange = 0;
     private double tgtTime = 0;
     
@@ -129,6 +130,12 @@ public class JeVoisInterface
         packetListenerThread.setDaemon(true);
         packetListenerThread.start();
 
+
+        System.out.println("PREPARING NETWORKTABLES");
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        tb = inst.getTable("Visions");
+        coneangle = tb.getDoubleTopic("ctheta").publish();
+        System.out.println("FINISHED PREPARING NETWORKTABLES");
     } 
 
     public void start(){
@@ -594,9 +601,11 @@ public class JeVoisInterface
         final int CPU_TEMP = 3;
 
         //Split string into many substrings, presuming those strings are separated by commas
+        //WRITES TO NETWORKTABLES.
         String[] tokens = pkt.split(PKT_SEP);
         for (String x:tokens) {
             System.out.println(x);
+            coneangle.set(Double.parseDouble(tokens[C_ANGLE]));
         }
         //Check there were enough substrings found
         if (tokens.length < 4) {
@@ -613,11 +622,9 @@ public class JeVoisInterface
 
             // tgtTime  = rx_Time - Double.parseDouble(tokens[TOK_JV_PIPEDELAY])/1000000.0;
 
-            cone_angle[0] = Double.parseDouble(tokens[C_ANGLE]);
             double frame_count = Double.parseDouble(tokens[F_COUNT]);
             jeVoisCpuTempC   = Double.parseDouble(tokens[CPU_TEMP]);
             jeVoisCpuLoadPct = Double.parseDouble(tokens[CPU_LOAD]);
-            System.out.println("cone angle:"+cone_angle[0]);
             // NetworkTableInstance nt = NetworkTableInstance.getDefault();
             // nt.getTable("Visions").putValue("angle", new NetworkTableEntry(nt, ))("angle", cone_angle[0]);
         } catch (Exception e) {
@@ -635,8 +642,6 @@ public class JeVoisInterface
     {
         public void run()
         {
-            NetworkTableInstance inst = NetworkTableInstance.getDefault();
-            NetworkTable sd = inst.getTable("Visions");
         	while(!Thread.interrupted())
             {
         		backgroundUpdate();   
