@@ -3,24 +3,8 @@ import cv2
 import numpy as np
 import math
 import re
-## Tell Orientation of Cones
-#
-# Add some description of your module here.
-#
-# @author Rocky Shao
-# ??????????????
-# @videomapping YUYV 640 480 30 YUYV 640 480 30 Orientation Orientation
-# @email rocky.shao@icsd.k12.ny.us
-# @address 123 first street, Los Angeles CA 90012, USA
-# @copyright Copyright (C) 2018 by Rocky Shao
-# @mainurl https://www.ithacacityschools.org/
-# @supporturl https://www.ithacacityschools.org/
-# @otherurl https://www.ithacacityschools.org/
-# @license license
-# @distribution Unrestricted
-# @restrictions None
-# @ingroup modules
-#save the test
+
+
 lower_yellow=np.array([0,0,0])
 
 higher_yellow=np.array([40,255,255])
@@ -54,11 +38,11 @@ def maskGenerator2(img,lower_color,higher_color):
     
 
     # hsv double check
-    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    maskb=cv2.inRange(img,lower_color,higher_color) 
+    #img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    #maskb=cv2.inRange(img,lower_color,higher_color) 
     # maskb=cv2.dilate(maskb,kernel1,iterations=1)
-    maskab = cv2.bitwise_and(maska, maskb)
-    return maskab
+   # maskab = cv2.bitwise_and(maska, maskb)
+   # return maskab
     return maska
 
 def circularmask(img):
@@ -128,7 +112,7 @@ def smallest_angle_vertex(vertices):
     min_angle = min(angles)
     min_index = angles.index(min_angle)
     return vertices[min_index]
-class Orientation:
+class Rocky:
     # ###################################################################################################
     ## Constructor
     def __init__(self):
@@ -141,21 +125,11 @@ class Orientation:
         self.angle_final = 0
 
 
-    # ###################################################################################################
-    def processNoUSB(self, inframe):
-        self.commonProcess(inframe=inframe)
-        
-
-    # ###################################################################################################
-    ## Process function with USB output
-    def process(self, inframe, outframe):
-        _, outimg = self.commonProcess(inframe, outframe)
-        outframe.sendCv(outimg)
-
+ 
    
         
     ## Process function with USB output
-    def commonProcess(self, inframe, outframe):
+    def process(self, inframe, outframe):
 
         frame = inframe.getCvBGR()
         frame = circularmask(frame)
@@ -207,47 +181,14 @@ class Orientation:
                 lower_x=point_x2
                 lower_y=point_y2-dis_center_to_target
                 dis_target_to_lower=((lower_x-x_final)**2+(lower_y-y_final)**2)**(1/2)
-                self.angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
+                angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
                 if x_final<point_x2:
-                    self.angle_final=(-1)*self.angle_final
+                    angle_final=(-1)*self.angle_final
                 # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
                 cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
 
     
         outimg = frame
+        outframe.sendCv(outimg)
         # Write a title:
-        cv2.putText(outimg, "JeVois Orientation", (3, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
-        
-        # Write frames/s info from our timer into the edge map (NOTE: does not account for output conversion time):
-        fps = self.timer.stop()
-        height = outimg.shape[0]
-        width = outimg.shape[1]
-        cv2.putText(outimg, fps, (3, height - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
-        
-        # Convert our output image to video output format and send to host over USB:
-        results = self.pattern.match(self.timer.stop())
-        if(results is not None):
-            self.framerate_fps = results.group(1)
-            self.CPULoad_pct = results.group(2)
-            self.CPUTemp_C = results.group(3)
-
-        
-        serialstr = "{%d %.2f %s %s}"%(
-            self.frame,
-            self.angle_final,
-            self.CPULoad_pct,
-            self.CPUTemp_C
-        )
-
-        jevois.sendSerial(serialstr)
-
-        self.frame += 1
-        self.frame %= 999
-
-        return self.angle_final, outimg
-        
-'''Pleaes send the value of angle_final to the bot'''
-'''it is in degrees of where the tip of the cone is pointing twards'''
-'''tip of cone pointing up is 0'''
-'''CW is positive'''
-'''CCW is negetive'''
+       
