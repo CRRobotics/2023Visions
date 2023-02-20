@@ -17,6 +17,7 @@ def maskGenerator1(img):#for cube
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     mask=cv2.erode(mask,kernel1,iterations=3)
     mask=cv2.dilate(mask,kernel1,iterations=1) 
+  
     '''
     Make a hsv double check for cubes
     '''
@@ -35,6 +36,7 @@ def maskGenerator2(img,lower_color,higher_color):
     
     maska=cv2.erode(maska,kernel1,iterations=3)
     maska=cv2.dilate(maska,kernel1,iterations=3) 
+
     
 
     # hsv double check
@@ -181,14 +183,15 @@ class Rocky:
                 lower_x=point_x2
                 lower_y=point_y2-dis_center_to_target
                 dis_target_to_lower=((lower_x-x_final)**2+(lower_y-y_final)**2)**(1/2)
-                angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
+                self.angle_final=math.acos(((dis_center_to_target)**2+(dis_center_to_target)**2-(dis_target_to_lower)**2)/(2*(dis_center_to_target)*(dis_center_to_target)))
                 if x_final<point_x2:
-                    angle_final=(-1)*self.angle_final
+                    self.angle_final=(-1)*self.angle_final
                 # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
-                cv2.putText(frame,str(math.degrees(angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
+                cv2.putText(frame,str(math.degrees(self.angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
 
     
         outimg = frame
-        outframe.sendCv(outimg)
+        outframe.sendCv(frame)
         # Write a title:
+       
        
