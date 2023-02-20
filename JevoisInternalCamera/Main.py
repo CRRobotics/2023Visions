@@ -51,15 +51,31 @@ def maskGenerator2(img,lower_color,higher_color):
     
     maska=cv2.erode(maska,kernel1,iterations=3)
     maska=cv2.dilate(maska,kernel1,iterations=3) 
+    return maska
+ 
+# def maskGenerator2(img,lower_color,higher_color):
+
+#     #bgr math
+#     # img==cv2.blur(img, (5,5)) 
+#     b,g,r=cv2.split(img)     
+#     diff = cv2.subtract(g, b)
+#     ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+
+#     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+#     # 
+#     # maska=cv2.dilate(maska,kernel1,iterations=5) 
+    
+#     maska=cv2.erode(maska,kernel1,iterations=3)
+#     maska=cv2.dilate(maska,kernel1,iterations=3) 
     
 
-    # hsv double check
-    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    maskb=cv2.inRange(img,lower_color,higher_color) 
-    # maskb=cv2.dilate(maskb,kernel1,iterations=1)
-    maskab = cv2.bitwise_and(maska, maskb)
-    return maskab
-    return maska
+#     # hsv double check
+#     img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+#     maskb=cv2.inRange(img,lower_color,higher_color) 
+#     # maskb=cv2.dilate(maskb,kernel1,iterations=1)
+#     maskab = cv2.bitwise_and(maska, maskb)
+#     return maskab
+#     return maska
 
 def circularmask(img):
     radius2 = 175
