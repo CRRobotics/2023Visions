@@ -50,7 +50,7 @@ def maskGenerator2(img,lower_color,higher_color):
     # maska=cv2.dilate(maska,kernel1,iterations=5) 
     
     maska=cv2.erode(maska,kernel1,iterations=3)
-    maska=cv2.dilate(maska,kernel1,iterations=3) 
+    maska=cv2.dilate(maska,kernel1,iterations=1) 
     return maska
  
 # def maskGenerator2(img,lower_color,higher_color):
@@ -78,7 +78,7 @@ def maskGenerator2(img,lower_color,higher_color):
 #     return maska
 
 def circularmask(img):
-    radius2 = 160
+    radius2 = 175
     ww, hh, _ = img.shape
     xc = hh // 2
     yc = ww // 2
@@ -215,6 +215,7 @@ class Orientation:
     def process(self, inframe, outframe):
         _, outimg = self.commonProcess(inframe, outframe)
         outframe.sendCv(outimg)
+       
 
    
         
