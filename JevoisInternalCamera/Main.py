@@ -78,7 +78,7 @@ def maskGenerator2(img,lower_color,higher_color):
 #     return maska
 
 def circularmask(img):
-    radius2 = 170
+    radius2 = 160
     ww, hh, _ = img.shape
     xc = hh // 2
     yc = ww // 2
