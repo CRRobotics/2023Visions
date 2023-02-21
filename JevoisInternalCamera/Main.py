@@ -159,7 +159,6 @@ class Orientation:
     def find_cube(self,frame):
             mask1 = maskGenerator1(frame)
             contours1=findContours(mask1)   
-            cv2.drawContours() 
             #contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
             if len(contours1) >0:
                 biggest_contour1=find_biggest_contour(contours1)
@@ -167,6 +166,9 @@ class Orientation:
                 area1=cv2.contourArea(biggest_contour1) 
                 if area1 >= 1600:
                     self.angle_final = 100
+                    return True
+            return False
+
     def find_cone(self,frame):
         mask2=maskGenerator2(frame,lower_yellow,higher_yellow)
         contours2=findContours(mask2) 
@@ -200,8 +202,9 @@ class Orientation:
                 if x_final<point_x2:
                     self.angle_final=(-1)*self.angle_final
                 # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
-                cv2.putText(frame,str(math.degrees(self.angle_final)),(point_x2,point_y2-10),0,1,(255,0,0),2)
-    
+                cv2.putText(frame,str(self.angle_final),(point_x2,point_y2-10),0,1,(255,0,0),2)
+                return True
+        return False
     # ###################################################################################################
     def processNoUSB(self, inframe):
         self.commonProcess(inframe=inframe)
@@ -228,9 +231,13 @@ class Orientation:
         '''
         Cube
         '''
-        self.find_cube(frame = frame)
-        if self.angle_final!= 100:
-            self.find_cone(frame = frame)
+        hascones = self.find_cone(frame)
+        if not hascones:
+            hascubes = self.find_cube(frame)
+            if not hascubes:
+                self.angle_final = 200
+            
+        
         outimg = frame
         # Write a title:
         cv2.putText(outimg, "JeVois Orientation", (3, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
