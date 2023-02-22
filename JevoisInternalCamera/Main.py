@@ -43,7 +43,7 @@ def maskGenerator2(img,lower_color,higher_color):
     # img==cv2.blur(img, (5,5)) 
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(g, b)
-    ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+    ret, maska = cv2.threshold(diff, 8, 255, cv2.THRESH_BINARY)
 
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     # 
@@ -78,7 +78,7 @@ def maskGenerator2(img,lower_color,higher_color):
 #     return maska
 
 def circularmask(img):
-    radius2 = 175
+    radius2 = 150
     ww, hh, _ = img.shape
     xc = hh // 2
     yc = ww // 2
@@ -179,7 +179,7 @@ class Orientation:
                 center2=find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
                 point_x2,point_y2=center2
                 #cv2.putText(frame,'{}cm,Cone'.format(distance_cm2),(point_x2,point_y2-10),0,1,(0,0,255),2)
-                epsilon = 0.04 * cv2.arcLength(biggest_contour2, True)
+                epsilon = 0.07 * cv2.arcLength(biggest_contour2, True)
                 approx = cv2.approxPolyDP(biggest_contour2, epsilon, True)
                 cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
                 cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
