@@ -50,6 +50,8 @@ class PipelineHull:
         """
         Runs the pipeline and sets all outputs to new values.
         """
+        #Step CircularMask
+        source0 = self.circularmask(source0)
         # Step HSV_Threshold0:
         self.__hsv_threshold_input = source0
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue, self.__hsv_threshold_saturation, self.__hsv_threshold_value)
@@ -64,12 +66,25 @@ class PipelineHull:
 
         # Step Find_Contours0:
         self.__find_contours_input = self.cv_canny_output
-        (self.find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
+        (self.__find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
 
+        #Step find biggestContor
+        self.__biggest_contour=self.find_biggest_contour(self.__find_contours_output)
+
+    
         # Step Convex_Hulls0:
-        self.__convex_hulls_contours = self.find_contours_output
-        (self.convex_hulls_output) = self.__convex_hulls(self.__convex_hulls_contours)
+         
+        (self.__convex_biggest_contour) = self.__convex_hulls(self.__biggest_contour)
 
+    @staticmethod
+    def circularmask(img):
+        radius2 = 175
+        ww, hh, _ = img.shape
+        xc = hh // 2
+        yc = ww // 2  
+        mask2 = np.zeros_like(img)
+        mask = cv2.circle(mask2, (xc,yc), radius2, (255,255,255), -1)
+        dst = cv2.bitwise_and(img, mask2)
 
     @staticmethod
     def __hsv_threshold(input, hue, sat, val):
@@ -139,77 +154,41 @@ class PipelineHull:
         contours, hierarchy = cv2.findContours(input, mode=mode, method=method)
         return contours
 
+    @staticmethod 
+    def find_biggest_contour(contours):
+        sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
+        biggest_contour=sortedContours[0]
+        return biggest_contour
+    
     @staticmethod
-    def __convex_hulls(input_contours):
+    def find_center_draw_contour(frame,biggest_contour):
+        
+        moments = cv2.moments(biggest_contour)
+        if moments['m00'] !=0:
+            center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
+            cv2.circle(frame, center, 3, (0, 0, 255), -1)
+            return center
+        
+    @staticmethod
+    def __convex_hulls(frame,biggest_contour):
+        cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
         """Computes the convex hulls of contours.
         Args:
             input_contours: A list of numpy.ndarray that each represent a contour.
         Returns:
             A list of numpy.ndarray that each represent a contour.
         """
-        output = []
-        for contour in input_contours:
-            output.append(cv2.convexHull(contour))
+        output = cv2.convexHull(biggest_contour)
         return output
 
 BlurType = Enum('BlurType', 'Box_Blur Gaussian_Blur Median_Filter Bilateral_Filter')
 
-'''
-lower_yellow=np.array([0,0,0])
-higher_yellow=np.array([40,255,255])
-'''
-def maskGenerator1(img):#for cube
-    img=cv2.blur(img, (5,5)) 
-    #img= cv2.GaussianBlur(img, (15, 15), 0)
-    b,g,r =cv2.split(img)     
-    diff = cv2.subtract(b,g)
-    ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
-    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-    mask=cv2.erode(mask,kernel1,iterations=3)
-    mask=cv2.dilate(mask,kernel1,iterations=1) 
-    return mask
-'''
-def maskGenerator2(img,lower_color,higher_color):    
-    b,g,r=cv2.split(img)     
-    diff = cv2.subtract(g, b)
-    ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
-    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))  
-    maska=cv2.erode(maska,kernel1,iterations=3)
-    maska=cv2.dilate(maska,kernel1,iterations=1) 
-    return maska
-    # hsv double check
-    # img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    # maskb=cv2.inRange(img,lower_color,higher_color) 
-    # # maskb=cv2.dilate(maskb,kernel1,iterations=1)
-    # maskab = cv2.bitwise_and(maska, maskb)
-'''
-def circularmask(img):
-    radius2 = 175
-    ww, hh, _ = img.shape
-    xc = hh // 2
-    yc = ww // 2  
-    mask2 = np.zeros_like(img)
-    mask = cv2.circle(mask2, (xc,yc), radius2, (255,255,255), -1)
-    dst = cv2.bitwise_and(img, mask2)
-    return dst
-'''
-def findContours(mask):
-    contours,hierarchy=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    contours=[cv2.convexHull(contour) for contour in contours]
-    return contours
-'''
-def find_biggest_contour(contours):
-    sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
-    biggest_contour=sortedContours[0]
-    return biggest_contour
 
-def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
-    cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
-    moments = cv2.moments(biggest_contour)
-    if moments['m00'] !=0:
-        center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-        cv2.circle(frame, center, 3, (0, 0, 255), -1)
-        return center
+
+
+
+
+
 
 def angle_between(p1, p2, p3):
     """Calculate the angle between three points in radians."""
