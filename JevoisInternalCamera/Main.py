@@ -37,7 +37,7 @@ def maskGenerator1(img):#for cube
     Make a hsv double check for cubes
     '''
     return mask
-'''
+
 def maskGenerator2(img,lower_color,higher_color):
 
     #bgr math
@@ -80,6 +80,7 @@ def maskGenerator2(img):
     #maska=cv2.dilate(maska,kernel1,iterations=3)
     #maska=cv2.erode(maska,kernel1,iterations=1) 
     return maska
+'''
 # def maskGenerator2(img,lower_color,higher_color):
 
 #     #bgr math
