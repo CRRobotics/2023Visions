@@ -40,9 +40,7 @@ class Orientation:
         self.timer.start()
         
 
-        '''
-        Cube
-        '''
+        '''Start Processing'''
         hascones,self.angle_final = f.find_cone(frame)
         if not hascones:
             hascubes,self.angle_final = f.find_cube(frame)
