@@ -69,12 +69,16 @@ class PipelineHull:
         (self.__find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
 
         #Step find biggestContor
-        self.__biggest_contour=self.find_biggest_contour(self.__find_contours_output)
+        self.__biggest_contour=self.__find_biggest_contour(self.__find_contours_output)
 
     
         # Step Convex_Hulls0:
          
         (self.__convex_biggest_contour) = self.__convex_hulls(self.__biggest_contour)
+
+        #Step Find cone tip
+
+        (self.__cone_tip) = self.smallest_angle_vertex(self.__convex_biggest_contour)
 
     @staticmethod
     def circularmask(img):
@@ -155,18 +159,18 @@ class PipelineHull:
         return contours
 
     @staticmethod 
-    def find_biggest_contour(contours):
+    def __find_biggest_contour(contours):
         sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
         biggest_contour=sortedContours[0]
         return biggest_contour
     
     @staticmethod
-    def find_center_draw_contour(frame,biggest_contour):
+    def find_center_draw_contour(biggest_contour):
         
         moments = cv2.moments(biggest_contour)
         if moments['m00'] !=0:
             center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-            cv2.circle(frame, center, 3, (0, 0, 255), -1)
+            
             return center
         
     @staticmethod
@@ -180,6 +184,33 @@ class PipelineHull:
         """
         output = cv2.convexHull(biggest_contour)
         return output
+    
+    @staticmethod
+    def __smallest_angle_vertex(self,vertices):
+        def angle_between(p1, p2, p3):
+            """Calculate the angle between three points in radians."""
+            x1, y1 = p1
+            x2, y2 = p2
+            x3, y3 = p3
+            a = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+            b = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+            c = math.sqrt((x3-x1)**2 + (y3-y1)**2)
+            return math.acos((a**2 + b**2 - c**2) / (2 * a * b))
+        """Find the vertex with the smallest angle in a polygon."""
+        angles = []
+        for i in range(len(vertices)):
+            p1 = vertices[i-1]
+            p2 = vertices[i]
+            p3 = vertices[(i+1) % len(vertices)]
+            angles.append(angle_between(p1, p2, p3))
+        min_angle = min(angles)
+        min_index = angles.index(min_angle)
+        return vertices[min_index]
+    @staticmethod
+    def __find_polygon(self,biggest_contour):
+        epsilon = 0.05 * cv2.arcLength(biggest_contour, True)
+        approx = cv2.approxPolyDP(biggest_contour, epsilon, True)
+        
 
 BlurType = Enum('BlurType', 'Box_Blur Gaussian_Blur Median_Filter Bilateral_Filter')
 
@@ -190,27 +221,9 @@ BlurType = Enum('BlurType', 'Box_Blur Gaussian_Blur Median_Filter Bilateral_Filt
 
 
 
-def angle_between(p1, p2, p3):
-    """Calculate the angle between three points in radians."""
-    x1, y1 = p1
-    x2, y2 = p2
-    x3, y3 = p3
-    a = math.sqrt((x2-x1)**2 + (y2-y1)**2)
-    b = math.sqrt((x2-x3)**2 + (y2-y3)**2)
-    c = math.sqrt((x3-x1)**2 + (y3-y1)**2)
-    return math.acos((a**2 + b**2 - c**2) / (2 * a * b))
 
-def smallest_angle_vertex(vertices):
-    """Find the vertex with the smallest angle in a polygon."""
-    angles = []
-    for i in range(len(vertices)):
-        p1 = vertices[i-1]
-        p2 = vertices[i]
-        p3 = vertices[(i+1) % len(vertices)]
-        angles.append(angle_between(p1, p2, p3))
-    min_angle = min(angles)
-    min_index = angles.index(min_angle)
-    return vertices[min_index]
+
+
 
 
 pipeline = PipelineHull()
