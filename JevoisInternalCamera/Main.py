@@ -37,6 +37,7 @@ def maskGenerator1(img):#for cube
     Make a hsv double check for cubes
     '''
     return mask
+'''
 def maskGenerator2(img,lower_color,higher_color):
 
     #bgr math
@@ -52,7 +53,33 @@ def maskGenerator2(img,lower_color,higher_color):
     maska=cv2.erode(maska,kernel1,iterations=3)
     maska=cv2.dilate(maska,kernel1,iterations=1) 
     return maska
- 
+'''
+def maskGenerator2(img):
+    lower_color=np.array([16,84,114])
+    higher_color=np.array([81,255,255])
+
+   
+    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    maska=cv2.inRange(img,lower_color,higher_color)
+    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    maska=cv2.erode(maska,kernel1,iterations=1)
+    
+    maska=cv2.dilate(maska,kernel1,iterations=3)
+    maska=cv2.erode(maska,kernel1,iterations=3) 
+    radius = 20
+    ksize = 2 * radius + 1
+    maska=cv2.GaussianBlur(maska, (ksize, ksize), radius) 
+    #ret,maska = cv2.threshold(maska, 28, 255, cv2.THRESH_BINARY)
+    #b,g,r=cv2.split(img)     
+    #diff = cv2.subtract(g, b)
+    #ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+   
+
+    #kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    
+    #maska=cv2.dilate(maska,kernel1,iterations=3)
+    #maska=cv2.erode(maska,kernel1,iterations=1) 
+    return maska
 # def maskGenerator2(img,lower_color,higher_color):
 
 #     #bgr math
