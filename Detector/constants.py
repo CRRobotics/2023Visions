@@ -12,5 +12,5 @@ higher_yellow=np.array([40,255,255])
 
 SERVER = "10.6.39.2"
 
-cam_height=0.95 # in meters
+cam_height=1.3 # in meters
 cam_mount_angle=30# in degrees
