@@ -24,7 +24,7 @@ while True:
             center1=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour1)
             point_x1,point_y1=center1
             distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
-            distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
+            #distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
             angle1=math.radians(angle1)
 
 
@@ -33,7 +33,7 @@ while True:
             cv2.putText(frame,'{}cm,Cube'.format(distance_cm1),(point_x1,point_y1-10),0,1,(0,0,255),2)
 
 
-            print('{}cm,Cube'.format(distance_cm1),'distance to bot:',distance1,'angle:',angle1)
+            #print('{}cm,Cube'.format(distance_cm1),'distance to bot:',distance1,'angle:',angle1)
 
         
     'CONE'
@@ -46,15 +46,15 @@ while True:
             center2=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
             point_x2,point_y2=center2
             distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
-            distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
+            #distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
             angle2=math.radians(angle2)
-            trigDistance = f.getTrigDistanceFromPixel(960-point_x2,distance_cm2)
+            #trigDistance = f.getTrigDistanceFromPixel(960-point_x2,distance_cm2)
 
             # f.pushval(nt, 'Detector', "coneDistance", trigDistance)
             # f.pushval(nt, 'Detector', "coneAngle", angle2)
 
 
-            print('{}cm,Cone'.format(distance_cm2),'distance to bot:',distance2,'angle:',angle2)
+            #print('{}cm,Cone'.format(distance_cm2),'distance to bot:',distance2,'angle:',angle2)
     cv2.imshow('sdf',frame)
     cv2.waitKey(1)
    

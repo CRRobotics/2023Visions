@@ -4,7 +4,7 @@ import numpy as np
 import math
 from dataclasses import dataclass
 import functions as f
-     
+import constants
 
 @dataclass
 class cconfig:
@@ -43,19 +43,19 @@ while True:
     Cube
     '''
 
-    mask1 = maskGenerator1(color_image)
-    contours1=findContours(mask1)    
+    mask1 = f.maskGenerator1(color_image)
+    contours1=f.findContours(mask1)    
     #contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
         for contour1 in contours1:
             area1=cv2.contourArea(contour1) 
             if area1>=1600:
-                center1=find_center_and_draw_center_and_contour_of_target(color_image,contour1)
+                center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
                 point_x1,point_y1=center1
             
-                dx1,dy1,dz1 = getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
+                dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
                 if dz1 != 0:
-                    x1,y1,z1=getCordinatesOfTarget_Bot(dx1,dy1,dz1,cam_mount_angle, cam_height)
+                    x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
                     cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                     
              
