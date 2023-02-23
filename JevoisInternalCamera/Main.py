@@ -41,8 +41,16 @@ class Orientation:
         
 
         '''
-        Cube
+        Start Processing
+        returns the value of angle final to robot
+        value of angle_final:
+        100--->Cube on record player
+        200--->nothing on record player
+        -3.14~3.14--->Cone on the record player and where the tip of the cone is pointing at
+        
+        
         '''
+        
         hascones,self.angle_final = f.find_cone(frame)
         if not hascones:
             hascubes,self.angle_final = f.find_cube(frame)
