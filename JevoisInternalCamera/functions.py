@@ -149,11 +149,14 @@ def smallest_angle_vertex(vertices):
     min_index = angles.index(min_angle)
     return vertices[min_index]
 def polygon(center,biggest_contour,frame):
+    center, dimensions, angle= cv2.minAreaRect(biggest_contour)
+    width,height = dimensions
     point_x2,point_y2=center
     epsilon = 0.07 * cv2.arcLength(biggest_contour, True)
     approx = cv2.approxPolyDP(biggest_contour, epsilon, True)
     cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
-    cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
+    # cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
+    cv2.putText(frame,str(width/height),(point_x2,point_y2-40),0,1,(255,0,0),2)
     return approx
 
 def find_angle(approx,frame,center):
