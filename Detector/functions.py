@@ -7,6 +7,29 @@ import threading
 import math
 
 from networktables import NetworkTables as nt
+def pushval(networkinstance, tablename:str, valuename, value:float):
+    table = networkinstance.getTable(tablename)
+    table.putNumber(valuename, value)
+
+def networkConnect() -> any:
+    cond = threading.Condition()
+    notified = [False]
+
+    def connectionListener(connected, info):
+        print(info, '; Connected=%s' % connected)
+        with cond:
+            notified[0] = True
+            cond.notify()
+
+    nt.initialize(server=constants.SERVER)
+    nt.addConnectionListener(connectionListener, immediateNotify=True)
+
+    with cond:
+        print("Waiting")
+        if not notified[0]:
+            cond.wait()
+    return nt
+
 '''
 def differentiateObject(depthMap,threshold,pixOffset):
     xRange=a.shape[0]
