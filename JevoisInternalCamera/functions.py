@@ -33,12 +33,18 @@ def maskGenerator2(img,lower_color,higher_color):
     # maska=cv2.dilate(maska,kernel1,iterations=5) 
     
     maska=cv2.erode(maska,kernel1,iterations=5)
+    img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    maskb=cv2.inRange(img,lower_color,higher_color) 
+    # maskb=cv2.dilate(maskb,kernel1,iterations=1)
+    maskab = cv2.bitwise_and(maska, maskb)
     # maska=cv2.dilate(maska,kernel1,iterations=1) 
     radius = 5
     ksize = 2 * radius + 1
-    maska=cv2.GaussianBlur(maska, (radius, radius), radius) 
+    maskab=cv2.GaussianBlur(maskab, (radius, radius), radius) 
+    # # hsv double check
+
     # maska = cv2.Canny(maska,100,200)
-    return maska
+    return maskab
  
 # def maskGenerator2(img,lower_color,higher_color):
 
