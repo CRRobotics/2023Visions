@@ -5,6 +5,7 @@ import constants
 import math
 import threading
 import math
+import pyrealsense2 as rs
 
 from networktables import NetworkTables as nt
 def pushval(networkinstance, tablename:str, valuename, value:float):
