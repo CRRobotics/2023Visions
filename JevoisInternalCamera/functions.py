@@ -149,8 +149,14 @@ def smallest_angle_vertex(vertices):
     min_index = angles.index(min_angle)
     return vertices[min_index]
 def polygon(center,biggest_contour,frame):
-    center, dimensions, angle= cv2.minAreaRect(biggest_contour)
+    '''prototype'''
+    #_________
+    box= cv2.minAreaRect(biggest_contour)
+    points = cv2.boxPoints(box)
+    cv2.polylines(frame, [points], True, (0, 0, 255), 6)
+    c, dimensions, angle= cv2.minAreaRect(biggest_contour)
     width,height = dimensions
+    #__________
     point_x2,point_y2=center
     epsilon = 0.07 * cv2.arcLength(biggest_contour, True)
     approx = cv2.approxPolyDP(biggest_contour, epsilon, True)
