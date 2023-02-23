@@ -40,7 +40,7 @@ def maskGenerator2(img,lower_color,higher_color):
     # maska=cv2.dilate(maska,kernel1,iterations=1) 
     radius = 5
     ksize = 2 * radius + 1
-    maskab=cv2.GaussianBlur(maskab, (radius, radius), radius) 
+    #maskab=cv2.GaussianBlur(maskab, (radius, radius), radius) 
     # # hsv double check
 
     # maska = cv2.Canny(maska,100,200)
@@ -99,7 +99,18 @@ def circularmask(img):
 def findContours(mask):
     contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
-    return contours
+    filtered_contours = []
+    for contour in contours:
+        box= cv2.minAreaRect(contour)
+        points = cv2.boxPoints(box)
+        asint = np.int0(points)
+        if len(asint) > 0:
+            c, dimensions, angle= cv2.minAreaRect(contour)
+            width,height = dimensions
+            if  width != 0 and height != 0 and width/height >= 0.4 and width/height <= 1.8 :
+                filtered_contours.append(contour)
+
+    return filtered_contours
 
 
 def find_biggest_contour(contours):
