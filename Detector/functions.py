@@ -4,8 +4,10 @@ import numpy as np
 import constants
 import math
 import threading
+import math
 
 from networktables import NetworkTables as nt
+'''
 def differentiateObject(depthMap,threshold,pixOffset):
     xRange=a.shape[0]
     yRange=a.shape[1]
@@ -27,195 +29,25 @@ def differentiateObject(depthMap,threshold,pixOffset):
                 perimeter+=1
     return tempArr
     # return (perimeter>((xRange+yRange)))
-        
-def pushval(networkinstance, tablename:str, valuename, value:float):
-    table = networkinstance.getTable(tablename)
-    table.putNumber(valuename, value)
-
-def networkConnect() -> any:
-    cond = threading.Condition()
-    notified = [False]
-
-    def connectionListener(connected, info):
-        print(info, '; Connected=%s' % connected)
-        with cond:
-            notified[0] = True
-            cond.notify()
-
-    nt.initialize(server=constants.SERVER)
-    nt.addConnectionListener(connectionListener, immediateNotify=True)
-
-    with cond:
-        print("Waiting")
-        if not notified[0]:
-            cond.wait()
-    return nt
-def getGroundDistanceFromPixel(pixel,depth):
-    w=1
-    x=w*pixel/1080
-    m=pi/2
-    y=depth*math.sin((pi/2)-m)
-    return(math.sqrt(x*x+y*y))
-def getTrigDistanceFromPixel(pixelX,distance):
-    #42.5/
-    degreesOverPixelsV = 42.5/1080
-    degreesOverPixelsH = 69.4/1920
-    cameraOffset = 72
-    angleX = math.radians(degreesOverPixelsH*pixelX)
-    return d*math.cos(angleX)
-def convertPixelToDepth(pixelX, pixelY):
-    #D stands for depth, c for color, h for horizontal, v for verticle
-    fovDV=58 
-    fovDH=87
-    fovCV=42.5
-    fovCH=69.4
-    XdeltaFOV=fovCH-fovDH
-    YdeltaFOV=fovCV-fovDV
-    resDV=720
-    resDH=1280
-    resCV=1080
-    resCH=1920
-    XdeltaRES=resCH-resDH
-    YdeltaRES=resCV-resDV
-    dpiCV=resCV/fovCV
-    dpiCH=resCH/fovCH
-
-    fixedCRH=resCH-(dpiCH*XdeltaFOV)
-    fixedCRV=resCV-(dpiCV*YdeltaFOV)
-    if(abs(pixelX-resCH) > abs(resCH - XdeltaRES/2)):
-        #then the pixel needs to be cut
-        return 0
-    if(abs(pixelY-resCV) > abs(resCV - YdeltaRES/2)):
-        return 0
-    return (fovDH/fixedCRH)*pixelX,(fovDV/fixedCRV)*pixelY
-    
-
-
-    # return ((distance*math.sin(angleX))**2+(distance*math.sin(angleY))**2)**1/2
-'''
-get distance and angle relitive to the point on the ground wich is directly under the center of the camera.
-'''
-def get_distance_and_angle(height_of_cam,distance_to_cam,x_of_target,y_of_target):
-    distance_to_bot=(distance_to_cam**2 -height_of_cam**2)**(1/2)
-    # angle=math.degrees(math.asin(((distance_to_cam) * (math.sin((x_of_target-640)*((math.radians(constants.fov_x))/1280)))/distance)%1))
-    angle_to_cam=(x_of_target-640)*((math.radians(constants.fov_x))/1280)
-    x_dis_to_bot=distance_to_cam*math.sin(angle_to_cam)
-    angle_to_bot=math.asin((x_dis_to_bot/distance_to_bot)%1)
-
-
-    #cv2.putText(frame,"distance to Bot"+str(distance)+'cm',(x_of_target,y_of_target+30),0,1,(0,0,255),2)
-    #cv2.putText(frame,"angle to Bot"+str(angle)+'degree',(x_of_target,y_of_target+60),0,1,(0,0,255),2)
-   
-    return distance_to_bot,angle_to_bot
-
-
-def getCorners(convexHull):#second stage dirivitive of all points
-    Array =convexHull
-    a=Array.tolist()
-    b=[]#position of points
-    for i in a:
-        for c in i:
-            c=tuple(c)
-            b.append(c)
-    first_stage=[]
-
-    for i in range(len(b)):
-        xa,xb=b[i]
-
-
-        if i !=len(b)-1:
-            xc,xd=b[i+1]
-        elif i == len(b)-1:
-            xc,xd=b[0]
-
-        if (xa-xc) !=0:
-            element=abs((xb-xd)/(xa-xc))
-        elif (xa-xc)==0:
-            element=0
-
-
-        first_stage.append(element)
-
-    
-    second_stage=[]
-    for i in range(len(first_stage)):
-        a=first_stage[i]
-
-        if i!=len(first_stage)-1:
-            b=first_stage[i+1]
-        elif i == len(first_stage)-1:
-            b=first_stage[0]
-
-        if (b-a) !=0:
-            element=abs(b-a)
-        elif (b-a)==0:
-            element=0
-            
-        second_stage.append(element)
-    return second_stage
-
-
-
-
-def find_distance_to_the_point_on_the_target_which_is_on_the_ground_relative_to_cam(contour):
-
-    points_array=contour.tolist()
-    points_tuple=[]#position of convex points
-    for i in points_array:
-        for c in i:
-            c=tuple(c)
-            points_tuple.append(c)
-
-    # d=[]#matching positions of convex points  on depth map
-    # for i in points_tuple:
-    #     x,y=i
-    #     e=depth_frame[y,x]#first y then x
-    #     d.append(e)
-    biggest_y=0
-    indexer=0
-    for i in range(len(points_tuple)):
-        x,y=points_tuple[i]
-        if y >= biggest_y:
-            biggest_y=y
-            indexer=i
-    return points_tuple[indexer]#position of the point with the biggest y value.
-
-
-
-'''
-HSV MASK
-'''
-# def maskGenerator(img,lower_color,higher_color):
-#     img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-#     img_blur=cv2.blur(img, (5,5)) 
-#     mask=cv2.inRange(img_blur,lower_color,higher_color)    
-#     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-#     mask=cv2.erode(mask,kernel1,iterations=3)
-#     mask=cv2.dilate(mask,kernel1,iterations=1)       
-#     return mask
-
-
-'''
-BGR MASK, 1 for cube, 2 for cone
-'''
-
-
-
-def maskGenerator1(img):
-    img==cv2.blur(img, (5,5)) 
+'''     
+def maskGenerator1(img):#for cube
+    img=cv2.blur(img, (5,5)) 
+    #img= cv2.GaussianBlur(img, (15, 15), 0)
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(b,g)
     ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     mask=cv2.erode(mask,kernel1,iterations=3)
     mask=cv2.dilate(mask,kernel1,iterations=1) 
+    '''
+    Make a hsv double check for cubes
+    '''
     return mask
 
-
-def maskGenerator2(img,lower_color,higher_color):
+def maskGenerator2(img,lower_color,higher_color):#for cone
 
     #bgr math
-    img==cv2.blur(img, (5,5)) 
+    img= cv2.GaussianBlur(img, (15, 15), 0) 
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(g, b)
     ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
@@ -230,29 +62,11 @@ def maskGenerator2(img,lower_color,higher_color):
     maskb=cv2.dilate(maskb,kernel1,iterations=1)
     maskab = cv2.bitwise_and(maska, maskb)
     return maskab
-    
-def maskGenerator3(img):
-
-    #bgr math
-    img==cv2.blur(img, (5,5)) 
-    b,g,r=cv2.split(img)     
-    diff = cv2.add(g, r)
-    ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
-    kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-    maska=cv2.erode(maska,kernel1,iterations=3)
-    maska=cv2.dilate(maska,kernel1,iterations=1) 
-    return maska
-
-
-
 
 def findContours(mask):
     contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
     return contours
-    #return contours
-
-
 
 def filter_out_contours_that_doesnot_look_like_square(contours):  
     filteredContours=[]
@@ -266,8 +80,6 @@ def filter_out_contours_that_doesnot_look_like_square(contours):
         if ratio1 >= 0.5 and ratio2 >= 0.7 and ratio2 <= 1.1:
             filteredContours.append(contour)
     return filteredContours
-
-
 
 
 def find_biggest_contour(contours):
@@ -284,8 +96,92 @@ def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
         cv2.circle(frame, center, 3, (0, 0, 255), -1)
         return center
 
-        
+def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
+    intrinsics = rs.video_stream_profile(color_frame.profile).get_intrinsics()
+    point_2d = np.array([x, y]) # Example pixel position
+    point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
+    dx,dy,dz = point_3d
+    return -1*dy ,-1*dx, dz  # x is right, y is up, z is front.
+    
+    
+def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
+    diagnal_dis=(dy**2+dz**2)**0.5
+    small_angle=math.atan(abs(dy)/dz)
+    mountAngle=math.radians(mountAngle)
+    if dy <= 0:
+        remain_angle=math.pi/2 - mountAngle - small_angle
+    else:
+        remain_angle=math.pi/2 - mountAngle + small_angle
+    z = diagnal_dis * math.sin(remain_angle)
+    y = camHeight - diagnal_dis * math.cos(remain_angle)
+    x = dx
+    return x,y,z
+def correct_dis(cam_dis):
+    real_dis = (1/0.359)*cam_dis - 69/0.359
+    return real_dis
+
+'''prototypes'''
 
 
+'''get av coordinates of center of target, averaging the cords around it'''
+def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
+    top_left_x = center_x -dimension
+    top_left_y = center_x -dimension
+    list_of_x=[]
+    list_of_z=[]
+    list_of_y=[]
 
+    list_of_x2=[]#used to remove 0
+    list_of_z2=[]
+    list_of_y2=[]
+    #put in values
+    for a in range(0,2*dimension+1):
+        for b in range(0,2*dimension+1):
+            dx,dy,dz = getCordinatesOfTarget_Cam(b,a, depth_frame, color_frame)
+            list_of_x.append(dx)
+            list_of_z.append(dz)
+            list_of_y.append(dy)
 
+    #start remove all 0 in the list
+    for i in list_of_x:
+        if i != 0:
+            list_of_x2.append(i)
+    for i in list_of_z:
+        if i !=0 :
+            list_of_z2.append(i)
+    for i in list_of_y:
+        if i !=0 :
+            list_of_y2.append(i)
+    x_av = 0
+    z_av =0
+    y_av =0
+    for i in list_of_x2:
+        x_av+=i
+    for i in list_of_z2:
+        z_av+=i
+    for i in list_of_y2:
+        y_av+=i
+    x_av/=len(list_of_x2)
+    z_av/=len(list_of_z2)
+    y_av/=len(list_of_y2)
+    return x_av,y_av,z_av
+'''get the point on the ground'''
+
+def get_ground_point(frame,contour):
+    cv2.drawContours(frame,[contour],0,(255,0,255),2)
+    points_array=contour.tolist()
+    points_tuple=[]#position of convex points
+    for i in points_array:
+        for c in i:
+            c=tuple(c)
+            points_tuple.append(c)
+    biggest_y=0
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if y >= biggest_y:
+            biggest_y=y
+            indexer=i
+    point=points_tuple[indexer]
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    return point#position of the point with the biggest y value.
