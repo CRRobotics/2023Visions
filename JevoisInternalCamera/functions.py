@@ -2,24 +2,7 @@ import cv2
 import numpy as np
 import math
 import re
-## Tell Orientation of Cones
-#
-# Add some description of your module here.
-#
-# @author Rocky Shao
-# ??????????????
-# @videomapping YUYV 640 480 30 YUYV 640 480 30 Orientation Orientation
-# @email rocky.shao@icsd.k12.ny.us
-# @address 123 first street, Los Angeles CA 90012, USA
-# @copyright Copyright (C) 2018 by Rocky Shao
-# @mainurl https://www.ithacacityschools.org/
-# @supporturl https://www.ithacacityschools.org/
-# @otherurl https://www.ithacacityschools.org/
-# @license license
-# @distribution Unrestricted
-# @restrictions None
-# @ingroup modules
-#save the test
+
 lower_yellow=np.array([0,0,0])
 
 higher_yellow=np.array([40,255,255])
@@ -149,6 +132,7 @@ def smallest_angle_vertex(vertices):
     min_index = angles.index(min_angle)
     return vertices[min_index]
 def polygon(center,biggest_contour,frame):
+
     '''prototype'''
     #_________
     box= cv2.minAreaRect(biggest_contour)
@@ -157,12 +141,17 @@ def polygon(center,biggest_contour,frame):
     c, dimensions, angle= cv2.minAreaRect(biggest_contour)
     width,height = dimensions
     #__________
+
     point_x2,point_y2=center
     epsilon = 0.07 * cv2.arcLength(biggest_contour, True)
     approx = cv2.approxPolyDP(biggest_contour, epsilon, True)
     cv2.polylines(frame, [approx], True, (0, 255, 0), 6)
-    # cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
-    cv2.putText(frame,str(width/height),(point_x2,point_y2-40),0,1,(255,0,0),2)
+    cv2.putText(frame,str(len(approx)),(point_x2,point_y2-40),0,1,(255,0,0),2)
+
+    #______
+    cv2.putText(frame,str(width/height),(point_x2,point_y2+40),0,1,(0,0,255),2)
+    #______
+    
     return approx
 
 def find_angle(approx,frame,center):
