@@ -34,7 +34,8 @@ while True:
     depth_frame = aligned_frames.get_depth_frame()
     color_frame = aligned_frames.get_color_frame()
     if not depth_frame or not color_frame: continue
-    ros=color_frame.profile.as_video_stream_profile().intrinsics
+
+    
     color_image = np.asanyarray(color_frame.get_data())
     
 
@@ -74,15 +75,20 @@ while True:
             area2=cv2.contourArea(contour2) 
             if area2 >= 1600:
                 center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
+
+                width, height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
                 point_x2,point_y2=center2
-                # dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
-                dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
+                cv2.putText(color_image, str(int(width))+'@'+str(int(height)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+                dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
+                #dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
+
         
             
                     
                 if dz2 != 0:
                     x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                    cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    # cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 
 
 
