@@ -36,7 +36,7 @@ while True:
     if not depth_frame or not color_frame: continue
     ros=color_frame.profile.as_video_stream_profile().intrinsics
     color_image = np.asanyarray(color_frame.get_data())
-
+    
 
     
     '''
@@ -75,7 +75,7 @@ while True:
             if area2 >= 1600:
                 center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                 point_x2,point_y2=center2
-                dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
+                # dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
                 dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
         
             
