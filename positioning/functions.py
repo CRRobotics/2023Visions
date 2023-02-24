@@ -202,8 +202,6 @@ def getRobotVals(ay, cameraid, px, py):
     xr = constants.CAMERA_CONSTANTS[cameraid]["xc"]
     yr = constants.CAMERA_CONSTANTS[cameraid]["yc"]
 
-    #print("THETA:", robotheta)
-
     transformationmatrix = np.array(
         [
             [math.cos(math.radians(ay)), -math.sin(math.radians(ay)), px],
