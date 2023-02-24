@@ -24,14 +24,14 @@ class Orientation:
     # ###################################################################################################
     ## Process function with USB output
     def process(self, inframe, outframe):
-        _, outimg = self.commonProcess(inframe, outframe)
+        _, outimg = self.commonProcess(inframe)
         outframe.sendCv(outimg)
        
 
    
         
     ## Process function with USB output
-    def commonProcess(self, inframe, outframe):
+    def commonProcess(self, inframe):
 
         frame = inframe.getCvBGR()
         frame = f.circularmask(frame)
