@@ -51,6 +51,7 @@ while True:
             area1=cv2.contourArea(contour1) 
             if area1>=1600:
                 center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
+
                 point_x1,point_y1=center1
             
                 dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
@@ -74,11 +75,14 @@ while True:
             if area2 >= 1600:
                 center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                 point_x2,point_y2=center2
-            
                 dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
+                dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
+        
+            
+                    
                 if dz2 != 0:
                     x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                    cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 
 
 

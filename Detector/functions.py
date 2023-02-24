@@ -150,7 +150,7 @@ def correct_dis(cam_dis):
 '''get av coordinates of center of target, averaging the cords around it'''
 def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     top_left_x = center_x -dimension
-    top_left_y = center_x -dimension
+    top_left_y = center_y -dimension
     list_of_x=[]
     list_of_z=[]
     list_of_y=[]
@@ -161,7 +161,7 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     #put in values
     for a in range(0,2*dimension+1):
         for b in range(0,2*dimension+1):
-            dx,dy,dz = getCordinatesOfTarget_Cam(b,a, depth_frame, color_frame)
+            dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
             list_of_x.append(dx)
             list_of_z.append(dz)
             list_of_y.append(dy)
