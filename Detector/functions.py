@@ -189,16 +189,21 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     z_av/=len(list_of_z2)
     y_av/=len(list_of_y2)
     return x_av,y_av,z_av
-'''get the point on the ground'''
-
-def get_ground_point(frame,contour):
-    cv2.drawContours(frame,[contour],0,(255,0,255),2)
+'''convert an np 2d array into a list of tuples, represent contour points'''
+def convert_contours_to_points(contour): 
     points_array=contour.tolist()
     points_tuple=[]#position of convex points
     for i in points_array:
         for c in i:
             c=tuple(c)
             points_tuple.append(c)
+    return points_tuple
+'''get the point on the ground'''
+def get_ground_point(frame,contour):
+
+    
+    points_tuple=convert_contours_to_points(contour)#position of convex points
+    
     biggest_y=0
     indexer=0
     for i in range(len(points_tuple)):
@@ -209,3 +214,64 @@ def get_ground_point(frame,contour):
     point=points_tuple[indexer]
     cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
+
+def get_top_point(frame,contour):
+
+    points_tuple=convert_contours_to_points(contour)
+    smallest_y=9999
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if y <= smallest_y:
+            smallest_y=y
+            indexer=i
+    point=points_tuple[indexer]
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    return point#position of the point with the biggest y value.
+
+def get_left_point(frame,contour):
+  
+    points_tuple=convert_contours_to_points(contour)
+    smallest_x=9999
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if x <= smallest_x:
+            smallest_x=x
+            indexer=i
+    point=points_tuple[indexer]
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    return point#position of the point with the biggest y value.
+def get_right_point(frame,contour):
+  
+    points_tuple=convert_contours_to_points(contour)
+    biggest_x=0
+    indexer=0
+    for i in range(len(points_tuple)):
+        x,y=points_tuple[i]
+        if x >= biggest_x:
+            biggest_x=x
+            indexer=i
+    point=points_tuple[indexer]
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    return point#position of the point with the biggest y value.
+
+def find_target_size(contour,depth_frame,color_frame):
+    up_point = get_top_point(contour)
+    down_point= get_ground_point(contour)
+    left_point = get_left_point(contour)
+    right_point  =get_right_point(contour)
+    x1,y1 = up_point 
+    x2,y2 = down_point
+    x3,y3 = left_point
+    x4,y4 = right_point 
+
+    x_up,y_up,z_up = getCordinatesOfTarget_Cam(x1, y1, depth_frame, color_frame)
+    x_down,y_down,z_down = getCordinatesOfTarget_Cam(x2, y2, depth_frame, color_frame)
+    x_left,y_left,z_left = getCordinatesOfTarget_Cam(x3, y3, depth_frame, color_frame)
+    x_right,y_right,z_right = getCordinatesOfTarget_Cam(x4, y4, depth_frame, color_frame)
+    
+    up_down = (y_up - y_down)*100
+    left_right = (x_right - x_left)*100
+    return up_down,left_right
+    
