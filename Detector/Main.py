@@ -52,9 +52,7 @@ while True:
             area1=cv2.contourArea(contour1) 
             if area1>=1600:
                 center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
-
                 point_x1,point_y1=center1
-            
                 dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
                 if dz1 != 0:
                     x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
@@ -75,22 +73,22 @@ while True:
             area2=cv2.contourArea(contour2) 
             if area2 >= 1600:
                 center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
-
                 width, height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
                 point_x2,point_y2=center2
-                cv2.putText(color_image, str(int(width))+'@'+str(int(height)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
+                #test:width and height
+                # cv2.putText(color_image, str(int(width))+'@'+str(int(height)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                #test:av cords
                 dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
-                #dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
-
-        
-            
-                    
+                dx22,dy22,dz22 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
+                cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(color_image, str(int(dx22*100))+'@'+str(int(dz22*100)), (point_x2,point_y2+20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                '''
                 if dz2 != 0:
                     x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
+                
                     # cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 
-
+                '''
 
                
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
@@ -98,7 +96,7 @@ while True:
 
     cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
     cv2.imshow("color_image", b)
-    key = cv2.waitKey(1)
+    key = cv2.waitKey(500)
     # Press esc or 'q' to close the image window
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()

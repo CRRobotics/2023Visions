@@ -125,7 +125,8 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     point_2d = np.array([x, y]) # Example pixel position
     point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
     dx,dy,dz = point_3d
-    return -1*dy ,-1*dx, dz  # x is right, y is up, z is front.
+    #retuen dx,dy,dz
+    return -1*dy ,-1*dx, dz  # x is right, y is up, z is front. AS ROTATED CAM 90 degreesCW
     
     
 def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
@@ -149,6 +150,7 @@ def correct_dis(cam_dis):
 
 '''get av coordinates of center of target, averaging the cords around it'''
 def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
+    #top left is actually top right
     top_left_x = center_x -dimension
     top_left_y = center_y -dimension
     list_of_x=[]
@@ -162,20 +164,20 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     for a in range(0,2*dimension+1):
         for b in range(0,2*dimension+1):
             dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
-            list_of_x.append(dx)
-            list_of_z.append(dz)
-            list_of_y.append(dy)
+            list_of_x.append(dx.copy())
+            list_of_z.append(dz.copy())
+            list_of_y.append(dy.copy())
 
     #start remove all 0 in the list
     for i in list_of_x:
         if i != 0:
-            list_of_x2.append(i)
+            list_of_x2.append(i.copy())
     for i in list_of_z:
         if i !=0 :
-            list_of_z2.append(i)
+            list_of_z2.append(i.copy())
     for i in list_of_y:
         if i !=0 :
-            list_of_y2.append(i)
+            list_of_y2.append(i.copy())
     x_av = 0
     z_av =0
     y_av =0
@@ -185,10 +187,13 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
         z_av+=i
     for i in list_of_y2:
         y_av+=i
-    x_av/=len(list_of_x2)
-    z_av/=len(list_of_z2)
-    y_av/=len(list_of_y2)
-    return x_av,y_av,z_av
+    try:
+        x_av/=len(list_of_x2)
+        z_av/=len(list_of_z2)
+        y_av/=len(list_of_y2)
+        return x_av,y_av,z_av
+    except:
+        return 0,0,0
 '''convert an np 2d array into a list of tuples, represent contour points'''
 def convert_contours_to_points(contour): 
     points_array=contour.tolist()
@@ -298,5 +303,5 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     
     up_down = (abs(y_up) + abs(y_down))*100
     left_right = (abs(x_right) + abs(x_left))*100
-    return up_down,left_right
+    return up_down,left_right#all in cm
     
