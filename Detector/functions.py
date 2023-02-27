@@ -265,11 +265,36 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     x2,y2 = down_point
     x3,y3 = left_point
     x4,y4 = right_point 
+    def getCordinatesOfTarget_Cam_neglect_0(x, y, depth_frame, color_frame,a):
+        #0,up; 1,down, 2,left, 3 right
+        #top right is (0,0)
+        #x, down, increase
+        #y,left, increase
+        cords = 0
+        while True:
+            cords_raw = getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame)
+            x_raw,y_raw,z_raw = cords_raw
+            if z_raw == 0:
+                if a == 0:
+                    x+=1
+                if a == 1:
+                    x -=1
+                if a == 2:
+                    y -=1
+                if a == 3:
+                    y+=1
+            else:
+                cords = cords_raw
+                break
+       
+        return cords
 
-    x_up,y_up,z_up = getCordinatesOfTarget_Cam(x1, y1, depth_frame, color_frame)
-    x_down,y_down,z_down = getCordinatesOfTarget_Cam(x2, y2, depth_frame, color_frame)
-    x_left,y_left,z_left = getCordinatesOfTarget_Cam(x3, y3, depth_frame, color_frame)
-    x_right,y_right,z_right = getCordinatesOfTarget_Cam(x4, y4, depth_frame, color_frame)
+
+        
+    x_up,y_up,z_up = getCordinatesOfTarget_Cam_neglect_0(x1, y1, depth_frame, color_frame,0)
+    x_down,y_down,z_down = getCordinatesOfTarget_Cam_neglect_0(x2, y2, depth_frame, color_frame,1)
+    x_left,y_left,z_left = getCordinatesOfTarget_Cam_neglect_0(x3, y3, depth_frame, color_frame,2)
+    x_right,y_right,z_right = getCordinatesOfTarget_Cam_neglect_0(x4, y4, depth_frame, color_frame,3)
     
     up_down = (abs(y_up) + abs(y_down))*100
     left_right = (abs(x_right) + abs(x_left))*100
