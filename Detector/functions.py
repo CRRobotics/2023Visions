@@ -199,7 +199,7 @@ def convert_contours_to_points(contour):
             points_tuple.append(c)
     return points_tuple
 '''get the point on the ground'''
-def get_ground_point(frame,contour):
+def get_left_point(frame,contour):
 
     
     points_tuple=convert_contours_to_points(contour)#position of convex points
@@ -215,7 +215,7 @@ def get_ground_point(frame,contour):
     cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
 
-def get_top_point(frame,contour):
+def get_right_point(frame,contour):
 
     points_tuple=convert_contours_to_points(contour)
     smallest_y=9999
@@ -229,7 +229,7 @@ def get_top_point(frame,contour):
     cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
 
-def get_left_point(frame,contour):
+def get_top_point(frame,contour):
   
     points_tuple=convert_contours_to_points(contour)
     smallest_x=9999
@@ -242,7 +242,7 @@ def get_left_point(frame,contour):
     point=points_tuple[indexer]
     cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
-def get_right_point(frame,contour):
+def get_ground_point(frame,contour):
   
     points_tuple=convert_contours_to_points(contour)
     biggest_x=0
