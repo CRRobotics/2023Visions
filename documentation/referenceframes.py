@@ -7,29 +7,29 @@ THETA_C_R = 35
 class FieldReferenceFrame(Scene):
     def construct(self):
         field_rec = Rectangle(WHITE, 6, 12)
-        f_ref_x = Arrow(ORIGIN, field_rec.get_left() + [1, 0, 0], buff=0)
-        f_x_lbl = MathTex("X_g +", font_size = 35).move_to(f_ref_x.end + [-.3, 0, 0])
-        f_ref_y = Arrow(ORIGIN, field_rec.get_bottom() + [0, 1, 0], buff=0)
-        f_y_lbl = MathTex("Y_g +", font_size = 35).move_to(f_ref_y.end + [0, -.2, 0])
+        f_ref_x = Arrow(field_rec.get_corner(DL), field_rec.get_bottom() + [1, 0, 0], buff=0).set_color(YELLOW)
+        f_x_lbl = MathTex("X_g +", font_size = 35).move_to(f_ref_x.end + [0,-.4, 0]).set_color(YELLOW)
+        f_ref_y = Arrow(field_rec.get_corner(DL), field_rec.get_left() + [0, 1, 0], buff=0).set_color(YELLOW)
+        f_y_lbl = MathTex("Y_g +", font_size = 35).move_to(f_ref_y.end + [ -.4,0, 0]).set_color(YELLOW)
 
         field= VGroup(field_rec, f_ref_x, f_ref_y, f_x_lbl, f_y_lbl)
 
         apriltag_labels = [
-            Tex("ID:3", color=YELLOW),
-            Tex("ID:2", color=YELLOW),
-            Tex("ID:1", color=YELLOW),
-            Tex("ID:8", color=YELLOW),
-            Tex("ID:7", color=YELLOW),
-            Tex("ID:6", color=YELLOW),
+            Tex("ID:3", color=RED),
+            Tex("ID:2", color=RED),
+            Tex("ID:1", color=RED),
+            Tex("ID:8", color=RED),
+            Tex("ID:7", color=RED),
+            Tex("ID:6", color=RED),
         ]
 
         points = [
             field.get_corner(DR)+ [.5, 1, 0],
             field.get_corner(DR)+ [.5, 2, 0],
             field.get_corner(DR)+ [.5, 3, 0],
-            field.get_corner(DL)+ [-.5, 1, 0],
-            field.get_corner(DL)+ [-.5, 2, 0],
-            field.get_corner(DL)+ [-.5, 3, 0]
+            field.get_corner(DL)+ [0.1, 1, 0],
+            field.get_corner(DL)+ [0.1, 2, 0],
+            field.get_corner(DL)+ [0.1, 3, 0]
         ]
 
         for label, point in list(zip(apriltag_labels, points)):

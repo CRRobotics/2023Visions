@@ -1,63 +1,104 @@
-
-from realsense_camera import *
+import pyrealsense2 as rs
 import cv2
-#load real sense camera
-rs=RealsenseCamera()
+import numpy as np
+import math
+from dataclasses import dataclass
 import functions as f
 import constants
-import math
+
+@dataclass
+class cconfig:
+    width: int
+    height: int
+    fr: int         # framerate
+    
+colorcfg = cconfig(width = 1280, height = 720, fr = 15)
+depthcfg = cconfig(width = 848, height = 480, fr = 15)
+
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.depth, depthcfg.width, depthcfg.height, rs.format.z16, depthcfg.fr)
+config.enable_stream(rs.stream.color, colorcfg.width, colorcfg.height, rs.format.bgr8, colorcfg.fr)
+pipeline.start(config)
+
+align_to = rs.stream.depth
+align = rs.align(align_to)
+
 # nt = f.networkConnect()
 while True:
-    ret, frame, depth_frame = rs.get_frame_stream()
-   
-
- 
-    'CUBE'
-  
-    mask1 = f.maskGenerator1(frame)
+    # This call waits until a new coherent set of frames is available on a device
+    frames = pipeline.wait_for_frames()
+    
+    #Aligning color frame to depth frame
+    aligned_frames =  align.process(frames)
+    depth_frame = aligned_frames.get_depth_frame()
+    color_frame = aligned_frames.get_color_frame()
+    if not depth_frame or not color_frame: continue
+    color_image = np.asanyarray(color_frame.get_data())  
+    '''
+    Cube
+    '''
+    mask1 = f.maskGenerator1(color_image)
     contours1=f.findContours(mask1)    
-    contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
+    #contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
-        biggest_contour1=f.find_biggest_contour(contours1)
-        area1=cv2.contourArea(biggest_contour1) 
-        if area1>=1600:
-            center1=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour1)
-            point_x1,point_y1=center1
-            distance_cm1= depth_frame[point_y1,point_x1]/10#y,x
-            distance1,angle1=f.get_distance_and_angle(constants.cam_height,distance_cm1,point_x1,point_y1)
-            angle1=math.radians(angle1)
+        for contour1 in contours1:
+            area1=cv2.contourArea(contour1) 
+            if area1>=1600:
+                center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
+                point_x1,point_y1=center1
+                dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
+                if dz1 != 0:
+                    x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
+                    cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    
+             
 
 
-            # f.pushval(nt,'Detector' , "cubeDiatance", distance1)
-            # f.pushval(nt,'Detector' , "cubeAngle", angle1)
-            cv2.putText(frame,'{}cm,Cube'.format(distance_cm1),(point_x1,point_y1-10),0,1,(0,0,255),2)
-
-
-            print('{}cm,Cube'.format(distance_cm1),'distance to bot:',distance1,'angle:',angle1)
-
-        
-    'CONE'
-    mask2=f.maskGenerator2(frame,constants.lower_yellow,constants.higher_yellow)
-    contours2=f.findContours(mask2)     
+             
+            
+    '''
+    Cone
+    '''
+    mask2=f.maskGenerator2(color_image,constants.lower_yellow,constants.higher_yellow)
+    contours2=f.findContours(mask2)    
     if len(contours2) >0:
-        biggest_contour2=f.find_biggest_contour(contours2)
-        area2=cv2.contourArea(biggest_contour2) 
-        if area2>=1600:
-            center2=f.find_center_and_draw_center_and_contour_of_target(frame,biggest_contour2)
-            point_x2,point_y2=center2
-            distance_cm2= depth_frame[point_y2,point_x2]/10#y,x
-            distance2,angle2=f.get_distance_and_angle(constants.cam_height,distance_cm2,point_x2,point_y2)
-            angle2=math.radians(angle2)
-            trigDistance = f.getTrigDistanceFromPixel(960-point_x2,distance_cm2)
+        for contour2 in contours2:
+            area2=cv2.contourArea(contour2) 
+            if area2 >= 1600:
+                center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
+                width, height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
+                point_x2,point_y2=center2
+                #test:width and height
+                # cv2.putText(color_image, str(int(width))+'@'+str(int(height)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                #test:av cords
+                dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
+                dx22,dy22,dz22 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
+                cv2.putText(color_image, str(int(dx2*100))+' __ '+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(color_image, str(int(dx22*100))+' __ '+str(int(dz22*100)), (point_x2,point_y2+20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                '''
+                if dz2 != 0:
+                    x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
+                
+                    # cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                
+                '''
 
-            # f.pushval(nt, 'Detector', "coneDistance", trigDistance)
-            # f.pushval(nt, 'Detector', "coneAngle", angle2)
-
-
-            print('{}cm,Cone'.format(distance_cm2),'distance to bot:',distance2,'angle:',angle2)
-    cv2.imshow('sdf',frame)
-    cv2.waitKey(1)
+               
+    b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
    
+
+    cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
+    cv2.imshow("color_image", b)
+    #set visualization frame rate
+    key = cv2.waitKey(500)
+    # Press esc or 'q' to close the image window
+    if key & 0xFF == ord('q') or key == 27:
+        cv2.destroyAllWindows()
+        break
+pipeline.stop()
+
+
 
 
 

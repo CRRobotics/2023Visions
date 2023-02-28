@@ -218,7 +218,27 @@ def filter_out_contours_that_doesnot_look_like_square(contours):
 
 
 
+def angle_between(p1, p2, p3):
+    """Calculate the angle between three points in radians."""
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+    a = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+    b = math.sqrt((x2-x3)**2 + (y2-y3)**2)
+    c = math.sqrt((x3-x1)**2 + (y3-y1)**2)
+    return math.acos((a**2 + b**2 - c**2) / (2 * a * b))
 
+def smallest_angle_vertex(vertices):
+    """Find the vertex with the smallest angle in a polygon."""
+    angles = []
+    for i in range(len(vertices)):
+        p1 = vertices[i-1]
+        p2 = vertices[i]
+        p3 = vertices[(i+1) % len(vertices)]
+        angles.append(angle_between(p1, p2, p3))
+    min_angle = min(angles)
+    min_index = angles.index(min_angle)
+    return vertices[min_index]
 def find_biggest_contour(contours):
     sortedContours = sorted(contours, key=lambda contour: -cv2.contourArea(contour))
     biggest_contour=sortedContours[0]

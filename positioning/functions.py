@@ -138,8 +138,8 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
 
 
             # Signs of x and y coordinates on unit circle
-            sx = 1 if pointCoords[0][0] <= 0 else -1
-            sy = 1 if pointCoords[1][0] <= 0 else -1
+            sx = 1 if pointX <= 0 else -1
+            sy = 1 if pointY <= 0 else -1
             # # Modify theta based on coordinate quadrant to compensate for arctan only going from -90 to 90
             ztheta = math.degrees(math.atan(pointCoords[1][0]/pointCoords[0][0])) + (180*sy)*(sx - 1)/(-2)
             ztheta -= 90
@@ -149,8 +149,6 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
             ax, ay, az = euler_angles_r
 
             px, py, pz = final_coords
-
-
 
             robocoords, robotheta = getRobotVals(ztheta, cameraid, px, py)
 
@@ -203,8 +201,6 @@ def getRobotVals(ay, cameraid, px, py):
     if robotheta > math.pi: robotheta -= math.tau
     xr = constants.CAMERA_CONSTANTS[cameraid]["xc"]
     yr = constants.CAMERA_CONSTANTS[cameraid]["yc"]
-
-    #print("THETA:", robotheta)
 
     transformationmatrix = np.array(
         [
