@@ -49,7 +49,7 @@ def maskGenerator3(img, lower_color, higher_color): #Elijah version
     _, maskr = cv2.threshold(r, 155, 255, cv2.THRESH_BINARY)
     _, maskg = cv2.threshold(g, 155, 255, cv2.THRESH_BINARY)
     masky = cv2.bitwise_and(maskr, maskg)
-    _, maskb = cv2.threshold(g, 100, 255, cv2.THRESH_BINARY)
+    _, maskb = cv2.threshold(b, 100, 255, cv2.THRESH_BINARY)
     maskb = cv2.bitwise_not(maskb)
     mask = cv2.bitwise_and(masky, maskb)
     return mask

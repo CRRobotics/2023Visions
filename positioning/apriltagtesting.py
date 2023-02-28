@@ -36,22 +36,12 @@ def process_frame(cameraid, path, nt, headless = False):
         if vecsdict:
             robotheta = vecsdict["angle"]
             rx, ry, _ = vecsdict["pos"]
-            margins = vecsdict["margins"]
-
-            # if cameraid == 0:
-            #     constants.RX_LOG.append(rx[0])
-            #     constants.RY_LOG.append(ry[0])
-            #     constants.RT_LOG.append(robotheta)
-            #     if not headless:
-            #         realtime_log()
-
             logStuff(cameraid, rx, ry, robotheta, timezz)
-            # pushval(nt, f"{cameraid}", "theta", robotheta)
-            # pushval(nt, f"{cameraid}", "rx",rx )
-            # pushval(nt, f"{cameraid}", "ry", ry)
-            # pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
-            # pushval(nt, f"{cameraid}", "time", timezz)
-            # pushval(nt, f"{cameraid}", "confidence", margins)
+            pushval(nt, f"{cameraid}", "theta", robotheta)
+            pushval(nt, f"{cameraid}", "rx",rx )
+            pushval(nt, f"{cameraid}", "ry", ry)
+            pushval(nt, f"{cameraid}", "ntags", vecsdict["tags"])
+            pushval(nt, f"{cameraid}", "time", timezz)
         if not headless: cv.imshow(f"CAMID{cameraid}:", shrinkFrame(frame1))
         cv.waitKey(1)
 
