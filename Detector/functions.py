@@ -8,9 +8,9 @@ import math
 import pyrealsense2 as rs
 
 from networktables import NetworkTables as nt
-def pushval(networkinstance, tablename:str, valuename, value:float):
+def pushval(networkinstance, tablename:str, valuename, value):
     table = networkinstance.getTable(tablename)
-    table.putNumber(valuename, value)
+    table.putNumberArray(valuename, value)
 
 def networkConnect() -> any:
     cond = threading.Condition()
@@ -31,29 +31,8 @@ def networkConnect() -> any:
             cond.wait()
     return nt
 
-'''
-def differentiateObject(depthMap,threshold,pixOffset):
-    xRange=a.shape[0]
-    yRange=a.shape[1]
-    tempArr=np.array(shape=(xRange,yRange), dtype=bool)
-    boundPix=False
-    perimeter=0
-    for x in range(0,xRange):
-        for y in range(0,yRange):
-            if depthMap[x,y]-depthMap[x,(y-pixOffset)]>threshold:
-                boundPix=True
-            if depthMap[x,y]-depthMap[x,(y+pixOffset)]>threshold:
-                boundPix=True
-            if depthMap[x,y]-depthMap[(x-pixOffset),y]>threshold:
-                boundPix=True
-            if depthMap[x,y]-depthMap[(x+pixOffset),y]>threshold:
-                boundPix=True
-            if boundPix:
-                tempArr[x,y] = True
-                perimeter+=1
-    return tempArr
-    # return (perimeter>((xRange+yRange)))
-'''     
+
+
 def maskGenerator1(img):#for cube
     img=cv2.blur(img, (5,5)) 
     #img= cv2.GaussianBlur(img, (15, 15), 0)
@@ -63,9 +42,6 @@ def maskGenerator1(img):#for cube
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     mask=cv2.erode(mask,kernel1,iterations=3)
     mask=cv2.dilate(mask,kernel1,iterations=1) 
-    '''
-    Make a hsv double check for cubes
-    '''
     return mask
 
 def maskGenerator2(img,lower_color,higher_color):#for cone
@@ -88,22 +64,11 @@ def maskGenerator2(img,lower_color,higher_color):#for cone
     return maskab
 
 def findContours(mask):
-    contours,hierarchy=cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours,hierarchy=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
     return contours
 
-def filter_out_contours_that_doesnot_look_like_square(contours):  
-    filteredContours=[]
-    for contour in contours:
-        x,y,w,h=cv2.boundingRect(contour)
-        ratio1=cv2.contourArea(contour)/(w*h)
-        ratio2=w/h
 
-        #aware of sth infront of cube
-        # if ratio1 >= 0.6 and ratio2 >= 0.8 and ratio2 <= 1.05:
-        if ratio1 >= 0.5 and ratio2 >= 0.7 and ratio2 <= 1.1:
-            filteredContours.append(contour)
-    return filteredContours
 
 
 def find_biggest_contour(contours):
@@ -127,7 +92,10 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     dx,dy,dz = point_3d
     #retuen dx,dy,dz
     return -1*dy ,-1*dx, dz  # x is right, y is up, z is front. AS ROTATED CAM 90 degreesCW
-    
+def correct_coordinate(input_coordinate):
+    input_coordinate*=100
+    real_coordinate = (input_coordinate+8.31)/1.0447
+    return real_coordinate/100 
     
 def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
     diagnal_dis=(dy**2+dz**2)**0.5
@@ -140,10 +108,11 @@ def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
     z = diagnal_dis * math.sin(remain_angle)
     y = camHeight - diagnal_dis * math.cos(remain_angle)
     x = dx
+    x=correct_coordinate(x)
+    y=correct_coordinate(y)
+    z=correct_coordinate(z)
     return x,y,z
-def correct_dis(cam_dis):
-    real_dis = (1/0.359)*cam_dis - 69/0.359
-    return real_dis
+
 
 '''prototypes'''
 
@@ -164,20 +133,20 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     for a in range(0,2*dimension+1):
         for b in range(0,2*dimension+1):
             dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
-            list_of_x.append(dx.copy())
-            list_of_z.append(dz.copy())
-            list_of_y.append(dy.copy())
+            list_of_x.append(dx)
+            list_of_z.append(dz)
+            list_of_y.append(dy)
 
     #start remove all 0 in the list
     for i in list_of_x:
         if i != 0:
-            list_of_x2.append(i.copy())
+            list_of_x2.append(i)
     for i in list_of_z:
         if i !=0 :
-            list_of_z2.append(i.copy())
+            list_of_z2.append(i)
     for i in list_of_y:
         if i !=0 :
-            list_of_y2.append(i.copy())
+            list_of_y2.append(i)
     x_av = 0
     z_av =0
     y_av =0
@@ -217,7 +186,7 @@ def get_left_point(frame,contour):
             biggest_y=y
             indexer=i
     point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    #cv2.circle(frame, point, 5, (255, 0, 0), -1)
     return point#position of the point with the biggest y value.
 
 def get_right_point(frame,contour):
@@ -231,7 +200,7 @@ def get_right_point(frame,contour):
             smallest_y=y
             indexer=i
     point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    #cv2.circle(frame, point, 5, (0, 255, 0), -1)
     return point#position of the point with the biggest y value.
 
 def get_top_point(frame,contour):
@@ -245,7 +214,7 @@ def get_top_point(frame,contour):
             smallest_x=x
             indexer=i
     point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    #cv2.circle(frame, point, 5, (0,0 , 255), -1)
     return point#position of the point with the biggest y value.
 def get_ground_point(frame,contour):
   
@@ -258,7 +227,7 @@ def get_ground_point(frame,contour):
             biggest_x=x
             indexer=i
     point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (255, 0, 0), -1)
+    #cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
 
 def find_target_size(contour,depth_frame,color_frame,color_image):
@@ -301,7 +270,12 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     x_left,y_left,z_left = getCordinatesOfTarget_Cam_neglect_0(x3, y3, depth_frame, color_frame,2)
     x_right,y_right,z_right = getCordinatesOfTarget_Cam_neglect_0(x4, y4, depth_frame, color_frame,3)
     
-    up_down = (abs(y_up) + abs(y_down))*100
-    left_right = (abs(x_right) + abs(x_left))*100
-    return up_down,left_right#all in cm
+    up_down =abs( y_up - y_down)*100
+    left_right = abs(x_right - x_left)*100
+    return left_right,up_down#all in cm
+# def put_rotated_text(color_image,str,point_x,point_y,a,b,c):
+#     (rows, cols, _) = color_image.shape
+#     M = cv2.getRotationMatrix2D((cols/2, rows/2), -90, 1)
+#     rotated_text = cv2.warpAffine(cv2.putText(color_image,str,(point_x,point_y) cv2.FONT_HERSHEY_SIMPLEX, 1, (a, b, c), 2))
+#     cv2.imshow("Rotated Text", rotated_text)
     

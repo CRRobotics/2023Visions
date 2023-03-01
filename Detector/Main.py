@@ -24,7 +24,7 @@ pipeline.start(config)
 align_to = rs.stream.depth
 align = rs.align(align_to)
 
-# nt = f.networkConnect()
+nt = f.networkConnect()
 while True:
     # This call waits until a new coherent set of frames is available on a device
     frames = pipeline.wait_for_frames()
@@ -38,51 +38,50 @@ while True:
     '''
     Cube
     '''
+    
     mask1 = f.maskGenerator1(color_image)
     contours1=f.findContours(mask1)    
-    #contours1=f.filter_out_contours_that_doesnot_look_like_square(contours1)
     if len(contours1) >0:
+        cubeX=[]
+        cubeY=[]
         for contour1 in contours1:
-            area1=cv2.contourArea(contour1) 
-            if area1>=1600:
+            width, height = f.find_target_size(contour1,depth_frame,color_frame,color_image)
+            #judges the target's actuall size
+            if (width>= 17 and width <= 30 and height >=17 and height <= 30):
                 center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
                 point_x1,point_y1=center1
-                dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
+                dx1,dy1,dz1 = f.get_average_cords(point_x1,point_y1, depth_frame, color_frame)
                 if dz1 != 0:
                     x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
-                    cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                    
-             
-
-
-             
-            
+                    cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
+                    cubeX.append(x1)
+                    cubeY.append(y1)      
+        f.pushval(nt,"Detector","cubeX",cubeX)
+        f.pushval(nt,"Detector","cubeY",cubeY)
+    
     '''
     Cone
     '''
+    coneX=[]
+    coneY=[]
     mask2=f.maskGenerator2(color_image,constants.lower_yellow,constants.higher_yellow)
     contours2=f.findContours(mask2)    
     if len(contours2) >0:
         for contour2 in contours2:
-            area2=cv2.contourArea(contour2) 
-            if area2 >= 1600:
+            width, height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
+            #judges the target's actuall size
+            if (width>= 10 and width <= 30 and height >=20 and height <= 40) or (width>= 20 and width <= 40 and height >=10 and height <= 30):
+                #2 conditions for up and knocked down cone
                 center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
-                width, height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
                 point_x2,point_y2=center2
-                #test:width and height
-                # cv2.putText(color_image, str(int(width))+'@'+str(int(height)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                #test:av cords
-                dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2, depth_frame, color_frame)
-                dx22,dy22,dz22 = f.get_average_cords(point_x2,point_y2,5,depth_frame, color_frame)
-                cv2.putText(color_image, str(int(dx2*100))+' __ '+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv2.putText(color_image, str(int(dx22*100))+' __ '+str(int(dz22*100)), (point_x2,point_y2+20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                '''
+                dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,15,depth_frame, color_frame)  
                 if dz2 != 0:
                     x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                
-                    # cv2.putText(color_image, str(int(dx2*100))+'@'+str(int(dz2*100)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                
-                '''
+                    cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    coneX.append(x1)
+                    coneY.append(y1)      
+        f.pushval(nt,"Detector","coneX",coneX)
+        f.pushval(nt,"Detector","coneY",coneY)
 
                
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
@@ -91,7 +90,7 @@ while True:
     cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
     cv2.imshow("color_image", b)
     #set visualization frame rate
-    key = cv2.waitKey(500)
+    key = cv2.waitKey(1)
     # Press esc or 'q' to close the image window
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()
