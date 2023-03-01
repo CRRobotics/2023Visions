@@ -19,6 +19,33 @@ def maskGenerator1(img):#for cube
     Make a hsv double check for cubes
     '''
     return mask
+def calibrateCone(image):
+    threshhold = 40
+    samples = [image[320,190],image[315,190],image[320,185],image[315,185]]
+    highBound = np.array([0,0,0])
+    lowBound = np.array([0,0,0])
+    bright=0
+    low=999
+    brightestPix=np.array([0,0,0])
+    lowestPix=np.array([0,0,0])
+    for pixel in samples:
+        pixelBrightness = pixel[0]+pixel[1]+pixel[2]
+        if pixel[0]+pixel[1]+pixel[2]>bright:
+            bright = pixel[0]+pixel[1]+pixel[2]
+            brightestPix=pixel
+        if pixel[0]+pixel[1]+pixel[2]<low:
+            low = pixel[0]+pixel[1]+pixel[2]
+            lowestPix=pixel
+        for pixel2 in samples:
+            if pixel[0]-pixel2[0]>threshhold or pixel[1]-pixel[1]>threshhold or pixel[2]-pixel[2]>threshhold:
+                print("Lighting is too damn harsh")
+
+            #if pixel[0]+pixel[1]+pixel[2]>pixel2[0]+pixel2[1]+pixel2[2]:
+    return brightestPix,lowestPix
+    #sort from highest to lowest
+    
+
+    #looks at the center pixels
 def maskGenerator2(img,lower_color,higher_color):
 
     #bgr math
