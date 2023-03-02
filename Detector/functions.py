@@ -88,6 +88,7 @@ def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
 def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     intrinsics = rs.video_stream_profile(color_frame.profile).get_intrinsics()
     point_2d = np.array([x, y]) # Example pixel position
+    depth_frame= depth_frame.as_depth_frame()
     point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
     dx,dy,dz = point_3d
     #retuen dx,dy,dz
@@ -186,7 +187,7 @@ def get_left_point(frame,contour):
             biggest_y=y
             indexer=i
     point=points_tuple[indexer]
-    #cv2.circle(frame, point, 5, (255, 0, 0), -1)
+    cv2.circle(frame, point, 5, (255, 0, 0), -1)
     return point#position of the point with the biggest y value.
 
 def get_right_point(frame,contour):
@@ -200,7 +201,7 @@ def get_right_point(frame,contour):
             smallest_y=y
             indexer=i
     point=points_tuple[indexer]
-    #cv2.circle(frame, point, 5, (0, 255, 0), -1)
+    cv2.circle(frame, point, 5, (0, 255, 0), -1)
     return point#position of the point with the biggest y value.
 
 def get_top_point(frame,contour):
@@ -214,7 +215,7 @@ def get_top_point(frame,contour):
             smallest_x=x
             indexer=i
     point=points_tuple[indexer]
-    #cv2.circle(frame, point, 5, (0,0 , 255), -1)
+    cv2.circle(frame, point, 5, (0,0 , 255), -1)
     return point#position of the point with the biggest y value.
 def get_ground_point(frame,contour):
   
@@ -227,7 +228,7 @@ def get_ground_point(frame,contour):
             biggest_x=x
             indexer=i
     point=points_tuple[indexer]
-    #cv2.circle(frame, point, 5, (0, 0, 255), -1)
+    cv2.circle(frame, point, 5, (0, 0, 255), -1)
     return point#position of the point with the biggest y value.
 
 def find_target_size(contour,depth_frame,color_frame,color_image):
@@ -244,22 +245,33 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
         #top right is (0,0)
         #x, down, increase
         #y,left, increase
-        cords = 0
+        cords = (0,0,0)
+     
+
         while True:
             cords_raw = getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame)
             x_raw,y_raw,z_raw = cords_raw
-            if z_raw == 0:
+            if z_raw == 0 and x_raw == 0 and y_raw == 0:#it hits a hole
+            
                 if a == 0:
                     x+=1
+        
                 if a == 1:
                     x -=1
+             
                 if a == 2:
                     y -=1
+             
                 if a == 3:
                     y+=1
+                   
+            if x <= 0 or x >= 847 or y <=0 or y >=479:
+                break
+
             else:
                 cords = cords_raw
                 break
+        
        
         return cords
 
@@ -269,13 +281,20 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     x_down,y_down,z_down = getCordinatesOfTarget_Cam_neglect_0(x2, y2, depth_frame, color_frame,1)
     x_left,y_left,z_left = getCordinatesOfTarget_Cam_neglect_0(x3, y3, depth_frame, color_frame,2)
     x_right,y_right,z_right = getCordinatesOfTarget_Cam_neglect_0(x4, y4, depth_frame, color_frame,3)
+
     
     up_down =abs( y_up - y_down)*100
     left_right = abs(x_right - x_left)*100
+    if z_right==0 or z_down==0 or z_up==0 or z_left==0:
+        return 0,0
     return left_right,up_down#all in cm
 # def put_rotated_text(color_image,str,point_x,point_y,a,b,c):
 #     (rows, cols, _) = color_image.shape
 #     M = cv2.getRotationMatrix2D((cols/2, rows/2), -90, 1)
 #     rotated_text = cv2.warpAffine(cv2.putText(color_image,str,(point_x,point_y) cv2.FONT_HERSHEY_SIMPLEX, 1, (a, b, c), 2))
 #     cv2.imshow("Rotated Text", rotated_text)
-    
+
+def fill_holes(depth_frame):
+        hole_filling = rs.hole_filling_filter()
+        filled_depth = hole_filling.process(depth_frame)
+        return filled_depth
