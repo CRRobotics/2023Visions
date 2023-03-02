@@ -222,6 +222,7 @@ def find_angle(approx,frame,center):
     if x_final<point_x2:
         angle_final=(-1)*angle_final
     # cv2.arrowedLine(frame, center2, (lower_x,lower_y),(0,0,255), 9) 
+    
     cv2.putText(frame,str(angle_final),(point_x2,point_y2-10),0,1,(255,0,0),2)
     return angle_final
 
