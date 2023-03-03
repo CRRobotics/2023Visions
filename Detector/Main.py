@@ -34,7 +34,8 @@ while True:
     depth_frame = f.fill_holes(aligned_frames.get_depth_frame())
     color_frame = aligned_frames.get_color_frame()
     if not depth_frame or not color_frame: continue
-    color_image = np.asanyarray(color_frame.get_data())  
+    # color_image = np.asanyarray(color_frame.get_data())  
+    color_image = f.fill_color_holes(aligned_frames, pipeline)
     '''
     Cube
     '''
@@ -106,3 +107,19 @@ pipeline.stop()
 
 
 
+"""
+       %%%%
+     % $  $ %
+     % 0  0 %
+  __   !__!
+    |   ||
+    |___||___
+       ||||  |
+       ||||  |___
+        ||
+    ____][_____
+    |         |
+    |         |
+   _|         |_
+    
+"""

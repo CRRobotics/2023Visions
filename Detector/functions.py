@@ -305,3 +305,41 @@ def fill_holes(depth_frame):
     hole_filling.set_option(rs.option.holes_fill,2) # set hole-filling radius to maximum (2)
     depth_frame = hole_filling.process(depth_frame)
     return depth_frame
+def fill_color_holes(aligned_frames, pipeline):
+    depth_frame = aligned_frames.get_depth_frame()
+    color_frame = aligned_frames.get_color_frame()
+    
+    if not depth_frame or not color_frame:
+        return None
+    
+    depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+    color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+
+    # Get the depth and color scale factors
+    depth_scale = pipeline.get_active_profile().get_device().first_depth_sensor().get_depth_scale()
+    color_sensor = pipeline.get_active_profile().get_device().query_sensors()[1]
+    color_scale = color_sensor.get_option(rs.option.enable_auto_exposure)
+
+    # Convert depth and color frames to numpy arrays
+    depth_image = np.asanyarray(depth_frame.get_data())
+    color_image = np.asanyarray(color_frame.get_data())
+
+    # Loop through each pixel in the color frame
+    for y in range(color_intrin.height):
+        for x in range(color_intrin.width):
+            # Get the corresponding pixel in the depth frame
+            depth_pixel = rs.rs2_project_color_pixel_to_depth_pixel(depth_image, depth_scale, depth_intrin, color_intrin, [x, y])
+
+            # Check if the depth pixel is valid
+            if depth_pixel[0] >= 0 and depth_pixel[0] < depth_intrin.width and depth_pixel[1] >= 0 and depth_pixel[1] < depth_intrin.height:
+                # Get the corresponding depth value
+                depth_value = depth_image[depth_pixel[1], depth_pixel[0]]
+
+                # Check if the depth value is valid
+                if depth_value > 0:
+                    # Map the color value to the missing pixel
+                    color_value = color_image[y, x]
+                    if color_value[0] == 0 and color_value[1] == 0 and color_value[2] == 0:
+                        color_image[y, x] = color_sensor.color_sensor_to_pixel([depth_pixel[0], depth_pixel[1]], depth_value * depth_scale) * color_scale
+                        
+    return color_image
