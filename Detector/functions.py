@@ -241,17 +241,23 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     x3,y3 = left_point
     x4,y4 = right_point 
     def getCordinatesOfTarget_Cam_neglect_0(x, y, depth_frame, color_frame,a):
+        #rotated cam 90 degree CW
         #0,up; 1,down, 2,left, 3 right
         #top right is (0,0)
         #x, down, increase
         #y,left, increase
         cords = (0,0,0)
+        x=x
+        y=y
+        a=a
+        depth_frame=depth_frame
+        color_frame=color_frame
      
 
         while True:
             cords_raw = getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame)
             x_raw,y_raw,z_raw = cords_raw
-            if z_raw == 0 and x_raw == 0 and y_raw == 0:#it hits a hole
+            if z_raw == 0:#it hits a hole
             
                 if a == 0:
                     x+=1
@@ -288,13 +294,14 @@ def find_target_size(contour,depth_frame,color_frame,color_image):
     if z_right==0 or z_down==0 or z_up==0 or z_left==0:
         return 0,0
     return left_right,up_down#all in cm
-# def put_rotated_text(color_image,str,point_x,point_y,a,b,c):
-#     (rows, cols, _) = color_image.shape
-#     M = cv2.getRotationMatrix2D((cols/2, rows/2), -90, 1)
-#     rotated_text = cv2.warpAffine(cv2.putText(color_image,str,(point_x,point_y) cv2.FONT_HERSHEY_SIMPLEX, 1, (a, b, c), 2))
-#     cv2.imshow("Rotated Text", rotated_text)
-
 def fill_holes(depth_frame):
-        hole_filling = rs.hole_filling_filter()
-        filled_depth = hole_filling.process(depth_frame)
-        return filled_depth
+    spatial_filter = rs.spatial_filter()
+    spatial_filter.set_option(rs.option.filter_magnitude, 5) # set filter magnitude to maximum (5)
+    spatial_filter.set_option(rs.option.filter_smooth_alpha, 1.0) # set smooth alpha to maximum (1.0)
+    spatial_filter.set_option(rs.option.filter_smooth_delta, 10) # set smooth delta to maximum (1000)
+    spatial_filter.set_option(rs.option.holes_fill, 1) # enable hole-filling
+    depth_frame = spatial_filter.process(depth_frame)
+    hole_filling = rs.hole_filling_filter()
+    hole_filling.set_option(rs.option.holes_fill,2) # set hole-filling radius to maximum (2)
+    depth_frame = hole_filling.process(depth_frame)
+    return depth_frame
