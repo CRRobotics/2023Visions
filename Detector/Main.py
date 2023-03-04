@@ -24,7 +24,7 @@ align_to = rs.stream.color
 align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
-# nt = f.networkConnect()
+nt = None#f.networkConnect()
 while True:
     # This call waits until a new coherent set of frames is available on a device
     frames = pipeline.wait_for_frames()
@@ -43,9 +43,10 @@ while True:
     '''
     mask1 = f.maskGenerator1(color_image)
     contours1,hierarchy=cv2.findContours(mask1,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    cubeX=[]
+    cubeY=[]
+    cubeZ=[]
     if len(contours1) >0:
-        cubeX=[]
-        cubeY=[]
         cubeAngle=[]
         for contour1 in contours1:
             if np.size(contour1) == 0: continue
@@ -65,16 +66,17 @@ while True:
                             # cv2.putText(color_image, str(int(cube_perimeter_x))+'/'+str(int(cube_perimeter_y)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                             cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
                             cubeX.append(x1)
-                            cubeY.append(y1)   
+                            cubeY.append(y1)
+                            cubeZ.append(z1)
                             cubeAngle.append(x1/z1)
-        # f.pushval(nt,"Detector","cubeX",cubeX)
-        # f.pushval(nt,"Detector","cubeY",cubeY)
+    f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
 
     '''
     Cone
     '''
     coneX=[]
     coneY=[]
+    coneZ=[]
     mask2=f.maskGenerator2(color_image,constants.lower_yellow,constants.higher_yellow)
     contours2,hierarchy=cv2.findContours(mask2,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     if len(contours2) >0:
@@ -97,9 +99,9 @@ while True:
                             # cv2.putText(color_image, str(int(cone_perimeter_x))+'/'+str(int(cone_perimeter_y)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                             cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                             coneX.append(x2)
-                            coneY.append(y2)      
-            # f.pushval(nt,"Detector","coneX",coneX)
-            # f.pushval(nt,"Detector","coneY",coneY)
+                            coneY.append(y2)
+                            coneZ.append(z2)
+    f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
                
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)

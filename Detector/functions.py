@@ -9,6 +9,9 @@ import pyrealsense2 as rs
 
 from networktables import NetworkTables as nt
 def pushval(networkinstance, tablename:str, valuename, value):
+    if networkinstance == None:
+        print(valuename, ": ", value)
+        return
     table = networkinstance.getTable(tablename)
     table.putNumberArray(valuename, value)
 
@@ -174,3 +177,21 @@ def find_contour_length(contour, distance):
     real_length_y = real_dist_pix_y * contour_length
 
     return real_length_x*100, real_length_y*100
+
+def find_and_push_closest(nt, object_type, object_x, object_y, object_z):
+    if len(object_z) == 0:
+        pushval(nt, "Detector", object_type, [0.0, 0.0, 0.0, 0.0])
+        return
+    
+    min_dist = 639
+    min_index = 639
+    for i in range(len(object_z)):
+        x = object_x[i]
+        y = object_y[i]
+        z = object_z[i]
+        dist = math.sqrt(x**2 + z**2)
+        if dist < min_dist:
+            min_dist = dist
+            min_index = i
+    
+    pushval(nt, "Detector", object_type, [1, object_x[min_index], object_y[min_index], object_z[min_index]])
