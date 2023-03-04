@@ -131,39 +131,41 @@ def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
     list_of_z2=[]
     list_of_y2=[]
     #put in values
-    for a in range(0,2*dimension+1):
-        for b in range(0,2*dimension+1):
-            dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
-            list_of_x.append(dx)
-            list_of_z.append(dz)
-            list_of_y.append(dy)
+    if center_x + dimension <= 847 and center_y +dimension <= 479:
+        for a in range(0,2*dimension+1):
+            for b in range(0,2*dimension+1):
+                dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
+                list_of_x.append(dx)
+                list_of_z.append(dz)
+                list_of_y.append(dy)
 
-    #start remove all 0 in the list
-    for i in list_of_x:
-        if i != 0:
-            list_of_x2.append(i)
-    for i in list_of_z:
-        if i !=0 :
-            list_of_z2.append(i)
-    for i in list_of_y:
-        if i !=0 :
-            list_of_y2.append(i)
-    x_av = 0
-    z_av =0
-    y_av =0
-    for i in list_of_x2:
-        x_av+=i
-    for i in list_of_z2:
-        z_av+=i
-    for i in list_of_y2:
-        y_av+=i
-    try:
-        x_av/=len(list_of_x2)
-        z_av/=len(list_of_z2)
-        y_av/=len(list_of_y2)
-        return x_av,y_av,z_av
-    except:
-        return 0,0,0
+        #start remove all 0 in the list
+        for i in list_of_x:
+            if i != 0:
+                list_of_x2.append(i)
+        for i in list_of_z:
+            if i !=0 :
+                list_of_z2.append(i)
+        for i in list_of_y:
+            if i !=0 :
+                list_of_y2.append(i)
+        x_av = 0
+        z_av =0
+        y_av =0
+        for i in list_of_x2:
+            x_av+=i
+        for i in list_of_z2:
+            z_av+=i
+        for i in list_of_y2:
+            y_av+=i
+        try:
+            x_av/=len(list_of_x2)
+            z_av/=len(list_of_z2)
+            y_av/=len(list_of_y2)
+            return x_av,y_av,z_av
+        except:
+            return 0,0,0
+    return 0,0,0
 '''convert an np 2d array into a list of tuples, represent contour points'''
 def convert_contours_to_points(contour): 
     points_array=contour.tolist()
@@ -174,6 +176,7 @@ def convert_contours_to_points(contour):
             points_tuple.append(c)
     return points_tuple
 '''get the point on the ground'''
+
 def get_left_point(frame,contour):
 
     
@@ -305,41 +308,32 @@ def fill_holes(depth_frame):
     hole_filling.set_option(rs.option.holes_fill,2) # set hole-filling radius to maximum (2)
     depth_frame = hole_filling.process(depth_frame)
     return depth_frame
-def fill_color_holes(aligned_frames, pipeline):
-    depth_frame = aligned_frames.get_depth_frame()
-    color_frame = aligned_frames.get_color_frame()
+
+# def crheck_contour_points(contour):
+#     contour = convert_contours_to_points(contour)
+#     empty_list = []
+#     for i in range(len(contour)):
+#         if i >= len(contour): break
+#         point = contour[i]
+#         x= point[0]
+#         y = point[1]
+#         if x > 847 or y > 479:
+#             del contour[i]
+#     contour = np.asanyarray(contour)
+#     return contou
+
+def check_contour_points(contour):
+    contour = convert_contours_to_points(contour)
+    filtered_contour1 =[]#list of tuple, tuple is inside depth_frame
+    for point in contour:
+        x,y = point
+        if x <= 847 and y <= 479:
+            filtered_contour1.append(point)
+    filtered_contour2=[]#list of list
+    for filtered_point in filtered_contour1:
+        filtered_point = list(filtered_point)
+        filtered_contour2.append(filtered_point)
+    filtered_contour3=np.array(filtered_contour2.copy())
+    return filtered_contour3
+
     
-    if not depth_frame or not color_frame:
-        return None
-    
-    depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
-    color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
-
-    # Get the depth and color scale factors
-    depth_scale = pipeline.get_active_profile().get_device().first_depth_sensor().get_depth_scale()
-    color_sensor = pipeline.get_active_profile().get_device().query_sensors()[1]
-    color_scale = color_sensor.get_option(rs.option.enable_auto_exposure)
-
-    # Convert depth and color frames to numpy arrays
-    depth_image = np.asanyarray(depth_frame.get_data())
-    color_image = np.asanyarray(color_frame.get_data())
-
-    # Loop through each pixel in the color frame
-    for y in range(color_intrin.height):
-        for x in range(color_intrin.width):
-            # Get the corresponding pixel in the depth frame
-            depth_pixel = rs.rs2_project_color_pixel_to_depth_pixel(depth_image, depth_scale, depth_intrin, color_intrin, [x, y])
-
-            # Check if the depth pixel is valid
-            if depth_pixel[0] >= 0 and depth_pixel[0] < depth_intrin.width and depth_pixel[1] >= 0 and depth_pixel[1] < depth_intrin.height:
-                # Get the corresponding depth value
-                depth_value = depth_image[depth_pixel[1], depth_pixel[0]]
-
-                # Check if the depth value is valid
-                if depth_value > 0:
-                    # Map the color value to the missing pixel
-                    color_value = color_image[y, x]
-                    if color_value[0] == 0 and color_value[1] == 0 and color_value[2] == 0:
-                        color_image[y, x] = color_sensor.color_sensor_to_pixel([depth_pixel[0], depth_pixel[1]], depth_value * depth_scale) * color_scale
-                        
-    return color_image
