@@ -1,7 +1,6 @@
 import pyrealsense2 as rs
 import cv2
 import numpy as np
-import math
 from dataclasses import dataclass
 import functions as f
 import constants
@@ -24,6 +23,7 @@ pipeline.start(config)
 align_to = rs.stream.color
 align = rs.align(align_to)
 
+#UNCOMMENT THIS FOR NETWORKTABLES
 # nt = f.networkConnect()
 while True:
     # This call waits until a new coherent set of frames is available on a device
@@ -31,42 +31,42 @@ while True:
     
     #Aligning color frame to depth frame
     aligned_frames =  align.process(frames)
-    # depth_frame = f.fill_holes(aligned_frames.get_depth_frame())
+    depth_frame = f.fill_holes(aligned_frames.get_depth_frame())
     depth_frame = aligned_frames.get_depth_frame()
     color_frame = aligned_frames.get_color_frame()
     
     if not depth_frame or not color_frame: continue
     color_image = np.asanyarray(color_frame.get_data())  
    
-    # color_image = f.fill_color_holes(aligned_frames, pipeline)
     '''
     Cube
     '''
     mask1 = f.maskGenerator1(color_image)
-    contours1=f.findContours(mask1)    
+    contours1,hierarchy=cv2.findContours(mask1,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     if len(contours1) >0:
         cubeX=[]
         cubeY=[]
         cubeAngle=[]
         for contour1 in contours1:
-            contour1 = f.check_contour_points(contour1)
-            
+            if np.size(contour1) == 0: continue
+            contour1 = cv2.convexHull(contour1)
             if cv2.contourArea(contour1) >= 1000:
-                cube_width, cube_height = f.find_target_size(contour1,depth_frame,color_frame,color_image)
-                if True:
+                cube_ratio = f.find_target_size(contour1,color_image)
+                if cube_ratio > constants.cube_min_ratio: #Change to check width/height
                     center1=f.find_center_and_draw_center_and_contour_of_target(color_image,contour1)
                     point_x1,point_y1=center1
-                    cv2.putText(color_image, str(int(cube_width)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
-                    cv2.putText(color_image, str(int(cube_height)), (point_x1,point_y1+30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)   
-                    if point_x1 <=847 and point_y1 <= 479:
-                        dx1,dy1,dz1 = f.get_average_cords(point_x1,point_y1, 15,depth_frame, color_frame)
-                        if dz1 != 0:
-                            
+                    
+                    dx1,dy1,dz1 = f.getCordinatesOfTarget_Cam(point_x1,point_y1, depth_frame, color_frame)
+                    if dz1 != 0:
+                        cube_perimeter_x, cube_perimeter_y = f.find_contour_length(contour1, dz1)
+                        if cube_perimeter_y >= constants.cube_min_parameter and cube_perimeter_y <= constants.cube_max_parameter:
+                            cv2.drawContours(color_image,[contour1],0,(0,255,0),3)
                             x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
-                            # cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
+                            # cv2.putText(color_image, str(int(cube_perimeter_x))+'/'+str(int(cube_perimeter_y)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            cv2.putText(color_image, str(int(x1*100))+'@'+str(int(z1*100)), (point_x1,point_y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
                             cubeX.append(x1)
                             cubeY.append(y1)   
-                            cubeAngle.append(x1/z1)   
+                            cubeAngle.append(x1/z1)
         # f.pushval(nt,"Detector","cubeX",cubeX)
         # f.pushval(nt,"Detector","cubeY",cubeY)
 
@@ -76,25 +76,26 @@ while True:
     coneX=[]
     coneY=[]
     mask2=f.maskGenerator2(color_image,constants.lower_yellow,constants.higher_yellow)
-    contours2=f.findContours(mask2)    
+    contours2,hierarchy=cv2.findContours(mask2,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     if len(contours2) >0:
         for contour2 in contours2:
-           
-            contour2 = f.check_contour_points(contour2)
-            if cv2.contourArea(contour2) >= 1000:
-                cone_width, cone_height = f.find_target_size(contour2,depth_frame,color_frame,color_image)
-            #judges the target's actuall size
-                # if (cone_width>= 18 and cone_width <= 45 and cone_height >=15 and cone_height <= 35) : #or (width>= 20 and width <= 40 and height >=10 and height <= 30):
-                if True:
-                
+            if np.size(contour2) == 0: continue
+            contour2 = cv2.convexHull(contour2)
+            if cv2.contourArea(contour2) >= 1600:
+                cone_ratio = f.find_target_size(contour2,color_image)
+                if cone_ratio>constants.cone_min_ratio:
                     center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                     point_x2,point_y2=center2
-                    if point_x2 <=847 and point_y2 <= 479:
-                    
-                        dx2,dy2,dz2 = f.get_average_cords(point_x2,point_y2,15,depth_frame, color_frame)  
-                        if dz2 != 0:
+                    # cv2.putText(color_image, str(int(cone_ratio)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
+                    dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2,depth_frame, color_frame)  
+                    if dz2 != 0:
+                        cone_perimeter_x, cone_perimeter_y = f.find_contour_length(contour2, dz2)
+                        if cone_perimeter_y >=constants.cone_min_parameter and cone_perimeter_y <= constants.cone_max_parameter:
+                            cv2.drawContours(color_image,[contour2],0,(0,255,0),3)
                             x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                            # cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                            cv2.putText(color_image, "%.2f"%y2, (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            # cv2.putText(color_image, str(int(cone_perimeter_x))+'/'+str(int(cone_perimeter_y)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                             coneX.append(x2)
                             coneY.append(y2)      
             # f.pushval(nt,"Detector","coneX",coneX)

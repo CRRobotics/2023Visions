@@ -38,7 +38,7 @@ def maskGenerator1(img):#for cube
     #img= cv2.GaussianBlur(img, (15, 15), 0)
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(b,g)
-    ret, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+    _, mask = cv2.threshold(diff, 28, 50, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     mask=cv2.erode(mask,kernel1,iterations=3)
     mask=cv2.dilate(mask,kernel1,iterations=1) 
@@ -50,7 +50,7 @@ def maskGenerator2(img,lower_color,higher_color):#for cone
     img= cv2.GaussianBlur(img, (15, 15), 0) 
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(g, b)
-    ret, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
+    _, maska = cv2.threshold(diff, 28, 50, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     maska=cv2.erode(maska,kernel1,iterations=3)
     maska=cv2.dilate(maska,kernel1,iterations=1) 
@@ -64,7 +64,7 @@ def maskGenerator2(img,lower_color,higher_color):#for cone
     return maskab
 
 def findContours(mask):
-    contours,hierarchy=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
     return contours
 
@@ -78,7 +78,7 @@ def find_biggest_contour(contours):
 
     
 def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
-    cv2.drawContours(frame,[biggest_contour],0,(255,0,255),3)
+    #cv2.drawContours(frame,[biggest_contour],0,(0,255,0),3)
     moments = cv2.moments(biggest_contour)
     if moments['m00'] !=0:
         center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
@@ -87,11 +87,12 @@ def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
 
 def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     intrinsics = rs.video_stream_profile(color_frame.profile).get_intrinsics()
+    
     point_2d = np.array([x, y]) # Example pixel position
     depth_frame= depth_frame.as_depth_frame()
-    point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d, depth_frame.get_distance(point_2d[0], point_2d[1]))
+    distance =  depth_frame.get_distance(point_2d[0], point_2d[1])
+    point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d,distance)
     dx,dy,dz = point_3d
-    #retuen dx,dy,dz
     return -1*dy ,-1*dx, dz  # x is right, y is up, z is front. AS ROTATED CAM 90 degreesCW
 def correct_coordinate(input_coordinate):
     input_coordinate*=100
@@ -118,54 +119,7 @@ def getCordinatesOfTarget_Bot(dx,dy,dz,mountAngle, camHeight):
 '''prototypes'''
 
 
-'''get av coordinates of center of target, averaging the cords around it'''
-def get_average_cords(center_x,center_y,dimension,depth_frame, color_frame):
-    #top left is actually top right
-    top_left_x = center_x -dimension
-    top_left_y = center_y -dimension
-    list_of_x=[]
-    list_of_z=[]
-    list_of_y=[]
 
-    list_of_x2=[]#used to remove 0
-    list_of_z2=[]
-    list_of_y2=[]
-    #put in values
-    if center_x + dimension <= 847 and center_y +dimension <= 479:
-        for a in range(0,2*dimension+1):
-            for b in range(0,2*dimension+1):
-                dx,dy,dz = getCordinatesOfTarget_Cam(top_left_x+b,top_left_y+a, depth_frame, color_frame)
-                list_of_x.append(dx)
-                list_of_z.append(dz)
-                list_of_y.append(dy)
-
-        #start remove all 0 in the list
-        for i in list_of_x:
-            if i != 0:
-                list_of_x2.append(i)
-        for i in list_of_z:
-            if i !=0 :
-                list_of_z2.append(i)
-        for i in list_of_y:
-            if i !=0 :
-                list_of_y2.append(i)
-        x_av = 0
-        z_av =0
-        y_av =0
-        for i in list_of_x2:
-            x_av+=i
-        for i in list_of_z2:
-            z_av+=i
-        for i in list_of_y2:
-            y_av+=i
-        try:
-            x_av/=len(list_of_x2)
-            z_av/=len(list_of_z2)
-            y_av/=len(list_of_y2)
-            return x_av,y_av,z_av
-        except:
-            return 0,0,0
-    return 0,0,0
 '''convert an np 2d array into a list of tuples, represent contour points'''
 def convert_contours_to_points(contour): 
     points_array=contour.tolist()
@@ -177,126 +131,6 @@ def convert_contours_to_points(contour):
     return points_tuple
 '''get the point on the ground'''
 
-def get_left_point(frame,contour):
-
-    
-    points_tuple=convert_contours_to_points(contour)#position of convex points
-    
-    biggest_y=0
-    indexer=0
-    for i in range(len(points_tuple)):
-        x,y=points_tuple[i]
-        if y >= biggest_y:
-            biggest_y=y
-            indexer=i
-    point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (255, 0, 0), -1)
-    return point#position of the point with the biggest y value.
-
-def get_right_point(frame,contour):
-
-    points_tuple=convert_contours_to_points(contour)
-    smallest_y=9999
-    indexer=0
-    for i in range(len(points_tuple)):
-        x,y=points_tuple[i]
-        if y <= smallest_y:
-            smallest_y=y
-            indexer=i
-    point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0, 255, 0), -1)
-    return point#position of the point with the biggest y value.
-
-def get_top_point(frame,contour):
-  
-    points_tuple=convert_contours_to_points(contour)
-    smallest_x=9999
-    indexer=0
-    for i in range(len(points_tuple)):
-        x,y=points_tuple[i]
-        if x <= smallest_x:
-            smallest_x=x
-            indexer=i
-    point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0,0 , 255), -1)
-    return point#position of the point with the biggest y value.
-def get_ground_point(frame,contour):
-  
-    points_tuple=convert_contours_to_points(contour)
-    biggest_x=0
-    indexer=0
-    for i in range(len(points_tuple)):
-        x,y=points_tuple[i]
-        if x >= biggest_x:
-            biggest_x=x
-            indexer=i
-    point=points_tuple[indexer]
-    cv2.circle(frame, point, 5, (0, 0, 255), -1)
-    return point#position of the point with the biggest y value.
-
-def find_target_size(contour,depth_frame,color_frame,color_image):
-    up_point = get_top_point(color_image,contour)
-    down_point= get_ground_point(color_image,contour)
-    left_point = get_left_point(color_image,contour)
-    right_point  =get_right_point(color_image,contour)
-    x1,y1 = up_point 
-    x2,y2 = down_point
-    x3,y3 = left_point
-    x4,y4 = right_point 
-    def getCordinatesOfTarget_Cam_neglect_0(x, y, depth_frame, color_frame,a):
-        #rotated cam 90 degree CW
-        #0,up; 1,down, 2,left, 3 right
-        #top right is (0,0)
-        #x, down, increase
-        #y,left, increase
-        cords = (0,0,0)
-        x=x
-        y=y
-        a=a
-        depth_frame=depth_frame
-        color_frame=color_frame
-     
-
-        while True:
-            cords_raw = getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame)
-            x_raw,y_raw,z_raw = cords_raw
-            if z_raw == 0:#it hits a hole
-            
-                if a == 0:
-                    x+=1
-        
-                if a == 1:
-                    x -=1
-             
-                if a == 2:
-                    y -=1
-             
-                if a == 3:
-                    y+=1
-                   
-            if x <= 0 or x >= 847 or y <=0 or y >=479:
-                break
-
-            else:
-                cords = cords_raw
-                break
-        
-       
-        return cords
-
-
-        
-    x_up,y_up,z_up = getCordinatesOfTarget_Cam_neglect_0(x1, y1, depth_frame, color_frame,0)
-    x_down,y_down,z_down = getCordinatesOfTarget_Cam_neglect_0(x2, y2, depth_frame, color_frame,1)
-    x_left,y_left,z_left = getCordinatesOfTarget_Cam_neglect_0(x3, y3, depth_frame, color_frame,2)
-    x_right,y_right,z_right = getCordinatesOfTarget_Cam_neglect_0(x4, y4, depth_frame, color_frame,3)
-
-    
-    up_down =abs( y_up - y_down)*100
-    left_right = abs(x_right - x_left)*100
-    if z_right==0 or z_down==0 or z_up==0 or z_left==0:
-        return 0,0
-    return left_right,up_down#all in cm
 def fill_holes(depth_frame):
     spatial_filter = rs.spatial_filter()
     spatial_filter.set_option(rs.option.filter_magnitude, 5) # set filter magnitude to maximum (5)
@@ -309,31 +143,34 @@ def fill_holes(depth_frame):
     depth_frame = hole_filling.process(depth_frame)
     return depth_frame
 
-# def crheck_contour_points(contour):
-#     contour = convert_contours_to_points(contour)
-#     empty_list = []
-#     for i in range(len(contour)):
-#         if i >= len(contour): break
-#         point = contour[i]
-#         x= point[0]
-#         y = point[1]
-#         if x > 847 or y > 479:
-#             del contour[i]
-#     contour = np.asanyarray(contour)
-#     return contou
-
-def check_contour_points(contour):
-    contour = convert_contours_to_points(contour)
-    filtered_contour1 =[]#list of tuple, tuple is inside depth_frame
-    for point in contour:
-        x,y = point
-        if x <= 847 and y <= 479:
-            filtered_contour1.append(point)
-    filtered_contour2=[]#list of list
-    for filtered_point in filtered_contour1:
-        filtered_point = list(filtered_point)
-        filtered_contour2.append(filtered_point)
-    filtered_contour3=np.array(filtered_contour2.copy())
-    return filtered_contour3
-
+def find_target_size(contour,color_image):
     
+    box= cv2.minAreaRect(contour)
+    points = cv2.boxPoints(box)
+    asint = np.int0(points)
+    
+    if len(asint) > 0:
+        # cv2.drawContours(color_image,[asint],0,(0,0,255),2)
+        center, dimensions, angle= cv2.minAreaRect(contour)
+        width,height = dimensions
+        
+        ratio = height/width
+        if ratio > 1: ratio = width/height
+        return ratio*100
+    return 0
+
+def find_contour_length(contour, distance):
+    contour_length = cv2.arcLength(contour,True)
+
+    # Assuming that the distance of the center pixel is the same as the pixels of the contour:
+    # Get actual perimeter of contour based on angle per pixel in the x direction
+    rad_per_pix_x = math.radians(constants.FoV_angle_deg_x)/constants.FoV_width_pix_x
+    real_dist_pix_x = distance * math.sin(rad_per_pix_x)
+    real_length_x = real_dist_pix_x * contour_length
+
+    # Same as above, but using y direction
+    rad_per_pix_y = math.radians(constants.FoV_angle_deg_y)/constants.FoV_width_pix_y
+    real_dist_pix_y = distance * math.sin(rad_per_pix_y)
+    real_length_y = real_dist_pix_y * contour_length
+
+    return real_length_x*100, real_length_y*100
