@@ -19,9 +19,12 @@ def circularmask(img):
     return dst
 
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 while True:
   s, f = cap.read()
-  f = circularmask(f)
+
+  # f = circularmask(f)
 
   cv2.imshow("frame",f)
 
