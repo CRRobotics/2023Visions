@@ -4,6 +4,7 @@ import numpy as np
 from dataclasses import dataclass
 import functions as f
 import constants
+import sys
 
 @dataclass
 class cconfig:
@@ -108,7 +109,8 @@ while True:
    
 
     cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
-    cv2.imshow("color_image", b)
+    if not "-h" in sys.argv:
+        cv2.imshow("color_image", b)
     #set visualization frame rate
     key = cv2.waitKey(1)
     # Press esc or 'q' to close the image window
