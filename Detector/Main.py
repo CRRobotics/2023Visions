@@ -24,7 +24,7 @@ align_to = rs.stream.color
 align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
-nt =f.networkConnect()
+nt =None#f.networkConnect()
 while True:
     # This call waits until a new coherent set of frames is available on a device
     frames = pipeline.wait_for_frames()
