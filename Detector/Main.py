@@ -1,4 +1,4 @@
-import pyrealsense2.pyrealsense2 as rs
+import pyrealsense2 as rs
 import cv2
 import numpy as np
 from dataclasses import dataclass
@@ -108,8 +108,9 @@ while True:
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
    
 
-    cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
+    
     if not "-h" in sys.argv:
+        cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
         cv2.imshow("color_image", b)
     #set visualization frame rate
     key = cv2.waitKey(1)
