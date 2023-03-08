@@ -46,9 +46,8 @@ align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
 nt =None#f.networkConnect()
-no_error = False
-attempts_for_error = 5
-while not no_error and attempts_for_error>0:
+
+for i in range(5):
     try:
         while True:
             # This call waits until a new coherent set of frames is available on a device
@@ -120,7 +119,7 @@ while not no_error and attempts_for_error>0:
                                 if cone_perimeter_y >=constants.cone_min_parameter and cone_perimeter_y <= constants.cone_max_parameter:
                                     cv2.drawContours(color_image,[contour2],0,(0,255,0),3)
                                     x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                                    cv2.putText(color_image, "%.2f"%y2, (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                                    #cv2.putText(color_image, "%.2f"%y2, (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                                     # cv2.putText(color_image, str(int(cone_perimeter_x))+'/'+str(int(cone_perimeter_y)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                                     cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                                     coneX.append(x2)
@@ -142,25 +141,24 @@ while not no_error and attempts_for_error>0:
             if key & 0xFF == ord('q') or key == 27:
                 cv2.destroyAllWindows()
                 break
-        no_error=True
-        pipeline.stop()
+        
+        
     except:
-        print(f"Could not wait for frames. {attempts_for_error-1} tries left.")
-        attempts_for_error-=1
+   
+        print(f"Could not wait for frames. {i+1} trie used.")
+      
         time.sleep(6)
 
 
-if not no_error:
-    print("Could not wait for frames for 5 times. Exiting.")
-    sys.exit()
+
 
 
 
 """
        %%%%
-     % $  $ %
-     % 0  0 %
-  __   !__!
+     % %  % %
+     % ^  ^ %
+  __ % \__/ %
     |   ||
     |___||___
        ||||  |
