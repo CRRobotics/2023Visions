@@ -13,7 +13,7 @@ class cconfig:
     fr: int         # framerate
     
 colorcfg = cconfig(width = 1280, height = 720, fr = 15)
-depthcfg = cconfig(width = 848, height = 480, fr = 15)
+depthcfg = cconfig(width = 640, height = 480, fr = 15)
 
 pipeline = rs.pipeline()
 config = rs.config()
