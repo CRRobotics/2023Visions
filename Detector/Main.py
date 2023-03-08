@@ -6,21 +6,41 @@ import functions as f
 import constants
 import sys
 
+import time
+
 @dataclass
 class cconfig:
     width: int
     height: int
     fr: int         # framerate
     
-colorcfg = cconfig(width = 1280, height = 720, fr = 15)
-depthcfg = cconfig(width = 640, height = 480, fr = 15)
-
+# colorcfg = cconfig(width = 1280, height = 720, fr = 15)
+# depthcfg = cconfig(width = 848, height = 480, fr = 15)
+# depthcfg = cconfig(width = 640, height = 480, fr = 15)
+colorcfg = cconfig(width = 640, height = 480, fr = 30)
+depthcfg = cconfig(width = 640, height = 480, fr = 30)
 pipeline = rs.pipeline()
 config = rs.config()
 config.enable_stream(rs.stream.depth, depthcfg.width, depthcfg.height, rs.format.z16, depthcfg.fr)
 config.enable_stream(rs.stream.color, colorcfg.width, colorcfg.height, rs.format.bgr8, colorcfg.fr)
-pipeline.start(config)
 
+##################
+connected = False
+tries_left = 10
+
+while not connected and tries_left > 0:
+    try:
+        pipeline.start(config)
+        connected = True
+    except:
+        print(f"Could not connect to camera. {tries_left-1} tries left.")
+        tries_left -= 1
+        time.sleep(1)
+
+if not connected:
+    print("Could not connect to camera after 10 tries. Exiting.")
+    sys.exit()
+################
 align_to = rs.stream.color
 align = rs.align(align_to)
 
