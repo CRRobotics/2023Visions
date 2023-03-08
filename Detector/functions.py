@@ -11,9 +11,9 @@ import csv
 from networktables import NetworkTables as nt
 def pushval(networkinstance, tablename:str, valuename, value):
     if networkinstance == None:
-        print(valuename, ": ", value)
+        # print(valuename, ": ", value)
         #UNCOMMENT WHEN USING MINI PC
-        #logStuff([valuename] + value)
+        logStuff([valuename] + value)
         return
     table = networkinstance.getTable(tablename)
     table.putNumberArray(valuename, value)
