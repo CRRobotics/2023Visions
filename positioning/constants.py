@@ -128,8 +128,8 @@ CAMERA_CONSTANTS = {
         "distortion":np.array([
             [.24313341925568496,  0,  0,  0, -1.1661345517623012]
         ]),
-        "yc": 0,
-        "xc": .145, #.145 for kitbot, -.105 for duckbot
+        "yc": 0.3175,
+        "xc": .2667, #.145 for kitbot, -.105 for duckbot
         "thetar": 180
     }
 }
