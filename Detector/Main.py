@@ -92,6 +92,7 @@ while True:
                             cubeAngle.append(x1/z1)
     f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
 
+
     '''
     Cone
     '''
@@ -110,8 +111,19 @@ while True:
                     center2=f.find_center_and_draw_center_and_contour_of_target(color_image,contour2)
                     point_x2,point_y2=center2
                     # cv2.putText(color_image, str(int(cone_ratio)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)   
-            
-
+                    dx2,dy2,dz2 = f.getCordinatesOfTarget_Cam(point_x2,point_y2,depth_frame, color_frame)  
+                    if dz2 != 0:
+                        cone_perimeter_x, cone_perimeter_y = f.find_contour_length(contour2, dz2)
+                        if cone_perimeter_y >=constants.cone_min_parameter and cone_perimeter_y <= constants.cone_max_parameter:
+                            cv2.drawContours(color_image,[contour2],0,(0,255,0),3)
+                            x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
+                            cv2.putText(color_image, str(cone_ratio), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            # cv2.putText(color_image, str(int(cone_perimeter_x))+'/'+str(int(cone_perimeter_y)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            # cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                            coneX.append(x2)
+                            coneY.append(y2)
+                            coneZ.append(z2)
+    f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
             
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)

@@ -15,9 +15,9 @@ cone_min_ratio = 50
 cube_min_ratio = 75
 
 FoV_angle_deg_x = 69
-FoV_width_pix_x = 1280
+FoV_width_pix_x = 640
 FoV_angle_deg_y = 42
-FoV_width_pix_y = 720
+FoV_width_pix_y = 480
 
 cone_min_parameter=60
 cone_max_parameter=105
