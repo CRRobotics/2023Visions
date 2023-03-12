@@ -6,11 +6,14 @@ import math
 import threading
 import math
 import pyrealsense2 as rs
+import csv
 
 from networktables import NetworkTables as nt
 def pushval(networkinstance, tablename:str, valuename, value):
     if networkinstance == None:
-        print(valuename, ": ", value)
+        # print(valuename, ": ", value)
+        #UNCOMMENT WHEN USING MINI PC
+        logStuff([valuename] + value)
         return
     table = networkinstance.getTable(tablename)
     table.putNumberArray(valuename, value)
@@ -41,7 +44,7 @@ def maskGenerator1(img):#for cube
     #img= cv2.GaussianBlur(img, (15, 15), 0)
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(b,g)
-    _, mask = cv2.threshold(diff, 28, 50, cv2.THRESH_BINARY)
+    _, mask = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     mask=cv2.erode(mask,kernel1,iterations=3)
     mask=cv2.dilate(mask,kernel1,iterations=1) 
@@ -53,7 +56,7 @@ def maskGenerator2(img,lower_color,higher_color):#for cone
     img= cv2.GaussianBlur(img, (15, 15), 0) 
     b,g,r=cv2.split(img)     
     diff = cv2.subtract(g, b)
-    _, maska = cv2.threshold(diff, 28, 50, cv2.THRESH_BINARY)
+    _, maska = cv2.threshold(diff, 28, 255, cv2.THRESH_BINARY)
     kernel1=cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     maska=cv2.erode(maska,kernel1,iterations=3)
     maska=cv2.dilate(maska,kernel1,iterations=1) 
@@ -195,3 +198,8 @@ def find_and_push_closest(nt, object_type, object_x, object_y, object_z):
             min_index = i
     
     pushval(nt, "Detector", object_type, [1, object_x[min_index], object_y[min_index], object_z[min_index]])
+
+def logStuff(listToLog):
+    with open("/home/crr/2023Visions/Detector/log.csv", "a+", newline="") as log:
+        c = csv.writer(log)
+        c.writerow(listToLog)
