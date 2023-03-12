@@ -43,7 +43,7 @@ align_to = rs.stream.color
 align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
-nt =None#f.networkConnect()
+nt =f.networkConnect()
 
 
 while True:
