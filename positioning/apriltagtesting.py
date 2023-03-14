@@ -21,16 +21,24 @@ def process_frame(cameraid, path, nt, headless = False):
     distco = constants.CAMERA_CONSTANTS[cameraid]["distortion"]
 
     while True:
-
+        timezz = datetime.now().timestamp()
         success, frame1 = cap.read()
 
         if not success:
+            robotheta = 63900
+            rx = 63900
+            ry = 63900
+            logStuff(cameraid, rx, ry, robotheta, timezz)
+            pushval(nt, f"{cameraid}", "theta", robotheta)
+            pushval(nt, f"{cameraid}", "rx",rx )
+            pushval(nt, f"{cameraid}", "ry", ry)
+            pushval(nt, f"{cameraid}", "ntags", 0)
+            pushval(nt, f"{cameraid}", "time", timezz)
             print("failed to get image from camid ", cameraid)
             cap.release()
             cap = waitForCam(path)
             cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
             continue
-        timezz = datetime.now().timestamp()
         vecsdict = getVecs(frame1, cammat, distco, detector, cameraid)
 
         if vecsdict:
