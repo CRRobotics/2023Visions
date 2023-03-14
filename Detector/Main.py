@@ -4,6 +4,9 @@ import numpy as np
 from dataclasses import dataclass
 import functions as f
 import constants
+import sys
+
+import time
 
 @dataclass
 class cconfig:
@@ -11,20 +14,38 @@ class cconfig:
     height: int
     fr: int         # framerate
     
-colorcfg = cconfig(width = 1280, height = 720, fr = 15)
-depthcfg = cconfig(width = 848, height = 480, fr = 15)
 
+colorcfg = cconfig(width = 1280, height = 720, fr = 10)
+depthcfg = cconfig(width = 848, height = 480, fr = 10)
 pipeline = rs.pipeline()
 config = rs.config()
 config.enable_stream(rs.stream.depth, depthcfg.width, depthcfg.height, rs.format.z16, depthcfg.fr)
 config.enable_stream(rs.stream.color, colorcfg.width, colorcfg.height, rs.format.bgr8, colorcfg.fr)
-pipeline.start(config)
 
+##################
+connected = False
+tries_left = 180
+
+while not connected and tries_left > 0:
+    try:
+        pipeline.start(config)
+        connected = True
+    except:
+        print(f"Could not connect to camera. {tries_left-1} tries left.")
+        tries_left -= 1
+        time.sleep(1)
+
+if not connected:
+    print("Could not connect to camera after 10 tries. Exiting.")
+    sys.exit()
+################
 align_to = rs.stream.color
 align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
-nt = None#f.networkConnect()
+nt =f.networkConnect()
+
+
 while True:
     # This call waits until a new coherent set of frames is available on a device
     frames = pipeline.wait_for_frames()
@@ -37,7 +58,7 @@ while True:
     
     if not depth_frame or not color_frame: continue
     color_image = np.asanyarray(color_frame.get_data())  
-   
+
     '''
     Cube
     '''
@@ -71,6 +92,7 @@ while True:
                             cubeAngle.append(x1/z1)
     f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
 
+
     '''
     Cone
     '''
@@ -95,27 +117,29 @@ while True:
                         if cone_perimeter_y >=constants.cone_min_parameter and cone_perimeter_y <= constants.cone_max_parameter:
                             cv2.drawContours(color_image,[contour2],0,(0,255,0),3)
                             x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
-                            cv2.putText(color_image, "%.2f"%y2, (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            cv2.putText(color_image, str(cone_ratio), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                             # cv2.putText(color_image, str(int(cone_perimeter_x))+'/'+str(int(cone_perimeter_y)), (point_x2,point_y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                            cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                            # cv2.putText(color_image, str(int(x2*100))+'@'+str(int(z2*100)), (point_x2,point_y2+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                             coneX.append(x2)
                             coneY.append(y2)
                             coneZ.append(z2)
     f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
-               
+            
     b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
-   
 
-    cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
-    cv2.imshow("color_image", b)
+
+    
+    if not "-h" in sys.argv:
+        cv2.namedWindow("color_image", cv2.WINDOW_NORMAL)
+        cv2.imshow("color_image", b)
     #set visualization frame rate
     key = cv2.waitKey(1)
     # Press esc or 'q' to close the image window
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()
         break
-pipeline.stop()
+
 
 
 
@@ -124,9 +148,9 @@ pipeline.stop()
 
 """
        %%%%
-     % $  $ %
-     % 0  0 %
-  __   !__!
+     % %  % %
+     % ^  ^ %
+  __ % \__/ %
     |   ||
     |___||___
        ||||  |
