@@ -126,7 +126,7 @@ while True:
     f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
             
-    b= cv2.rotate(color_image,cv2.ROTATE_90_CLOCKWISE)
+    b= cv2.rotate(color_image,cv2.ROTATE_90_COUNTERCLOCKWISE)
 
 
     

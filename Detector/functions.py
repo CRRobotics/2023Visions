@@ -99,7 +99,8 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     distance =  depth_frame.get_distance(point_2d[0], point_2d[1])
     point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, point_2d,distance)
     dx,dy,dz = point_3d
-    return -1*dy ,-1*dx, dz  # x is right, y is up, z is front. AS ROTATED CAM 90 degreesCW
+    # return -1*dy ,-1*dx, dz  # x is right, y is up, z is front. AS ROTATED CAM 90 degreesCW
+    return dy,dx,dz
 def correct_coordinate(input_coordinate):
     input_coordinate*=100
     real_coordinate = (input_coordinate+8.31)/1.0447
