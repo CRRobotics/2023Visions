@@ -246,9 +246,36 @@ def main():
            cameraconfig = json.load(fp)
     except:
         print(f"*** Could not open config file {configfn}")
+        cameraconfig = {
+ "matrix": [
+  [
+   850.1221797947615,
+   0.0,
+   622.2669226954358
+  ],
+  [
+   0.0,
+   847.7951726554022,
+   419.00219595660406
+  ],
+  [
+   0.0,
+   0.0,
+   1.0
+  ]
+ ],
+ "distortion": [
+  -0.37687332840173615,
+  0.19130262760331465,
+  -0.002466252816929792,
+  -0.0010478623272106558,
+  -0.05808206518422606
+ ],
+ "rms": 0.550689092955036
+}
 
     print(f"Using config {CALIBRATION} cameraid {CAMERAID}, tag family {TAG_FAMILY}")
-    cap:cv2.VideoCapture = cv2.VideoCapture(CAMERAID)
+    cap:cv2.VideoCapture = cv2.VideoCapture(0)
 
     if not cap.isOpened():
        print(f"*** Could not open cameraid {CAMERAID}")
@@ -291,5 +318,5 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-   MARGIN_THRESH = 20
+   MARGIN_THRESH = 0
    main()
