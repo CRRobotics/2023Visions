@@ -29,8 +29,9 @@ while True:
                 cv.circle(frame, corner, 5, (255,0,0), -1)
                 corner_counter += 1
             cx, cy = detection.center
+            margin = detection.decision_margin
             cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
-            cv.putText(frame, f"id: {detection.tag_id}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
+            cv.putText(frame, f"id: {detection.tag_id}, margin:{margin}", (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
 
 
 

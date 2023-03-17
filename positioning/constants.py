@@ -5,7 +5,7 @@ import math
 #import matplotlib.pyplot as plt
 
 TAG_FAMILY = "tag16h5"
-
+MARGIN_THRESHOLD = 60
 
 
 
@@ -121,8 +121,8 @@ CAMERA_CONSTANTS = {
   1.0476502704411934
  ]
         ]),
-       "yc": -.19685, #.34 for kitbot, .9 for duckbot
-        "xc": -.1778,
+       "yc": 0.04445, #.34 for kitbot, .9 for duckbot
+        "xc": -0.2667,
         "thetar": 57
 
     },

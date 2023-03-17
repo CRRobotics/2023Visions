@@ -79,7 +79,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
         margins = []
 
         for detection in detections:
-            if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4:
+            if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4 and detection["margin"] > constants.MARGIN_THRESHOLD:
                 
                 corner_counter = 1
                 for x, y in detection["lb-rb-rt-lt"]:
