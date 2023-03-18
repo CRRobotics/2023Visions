@@ -14,6 +14,17 @@ import csv
 # import matplotlib.pyplot as plt
 # import matplotlib.animation as animation
 
+
+##THIS FUNTION PREVENTs CLIPPING
+def allGoodCorners(l:list, framewidth:int, frameheight:int, margin:int) -> bool:
+    for corner in l:
+        x, y = corner
+        print(x, y)
+        if x < margin or x > framewidth - margin or y < margin or y > frameheight - margin:
+            return False
+    return True
+
+
 def networkConnect() -> any:
     cond = threading.Condition()
     notified = [False]
@@ -69,6 +80,8 @@ def draw(img, corners, imgpts):
 def getVecs(frame, cmtx, dist, detector, cameraid):
     detections = getDetections(detector,frame)
 
+    h, w, _ = frame.shape
+
     toreturn = {
     }
 
@@ -79,7 +92,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
         margins = []
 
         for detection in detections:
-            if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4 and detection["margin"] > constants.MARGIN_THRESHOLD:
+            if detection["id"] in [1,2,3,4,5,6,7,8] and len(detection["lb-rb-rt-lt"]) == 4 and detection["margin"] > constants.MARGIN_THRESHOLD and allGoodCorners(detection["lb-rb-rt-lt"], w, h, constants.PIXEL_MARGIN):
                 
                 corner_counter = 1
                 for x, y in detection["lb-rb-rt-lt"]:
@@ -92,7 +105,7 @@ def getVecs(frame, cmtx, dist, detector, cameraid):
                 tagcounter += 1
                 cv.circle(frame, (int(cx), int(cy)), 5, (0, 0, 255), -1)
                 cv.putText(frame, "id: %s"%(detection["id"]), (int(cx), int(cy) + 20), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255, 0))
-
+                
 
                 if detection["id"] in [5, 6, 7, 8]:
                     for coord in constants.CORNERS_AS_IN_FIELD_MAT_OTHER_WAY:
