@@ -179,7 +179,7 @@ CAMERA_CONSTANTS = {
  ]
         ]),
         "yc": 0.3175,
-        "xc": .2667, #.145 for kitbot, -.105 for duckbot
+        "xc": -.3567, #.145 for kitbot, -.105 for duckbot
         "thetar": 0
     }
 }
