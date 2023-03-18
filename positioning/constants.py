@@ -5,7 +5,7 @@ import math
 #import matplotlib.pyplot as plt
 
 TAG_FAMILY = "tag16h5"
-MARGIN_THRESHOLD = 60
+MARGIN_THRESHOLD = 41
 PIXEL_MARGIN = 7
 
 
