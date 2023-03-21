@@ -69,12 +69,20 @@ def maskGenerator2(img,lower_color,higher_color):#for cone
     maskab = cv2.bitwise_and(maska, maskb)
     return maskab
 
+def have_countours(contours):
+    if len(contours) >0:
+        return True
+    return False
+
 def findContours(mask):
     contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     contours=[cv2.convexHull(contour) for contour in contours]
     return contours
 
-
+def if_contour_big_enough(contour):
+    if cv2.contourArea(contour) >= 1600:
+        return True
+    return False
 
 
 def find_biggest_contour(contours):
@@ -83,12 +91,11 @@ def find_biggest_contour(contours):
     return biggest_contour
 
     
-def find_center_and_draw_center_and_contour_of_target(frame,biggest_contour):
+def find_contour_center(contour):
     #cv2.drawContours(frame,[biggest_contour],0,(0,255,0),3)
-    moments = cv2.moments(biggest_contour)
+    moments = cv2.moments(contour)
     if moments['m00'] !=0:
         center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-        cv2.circle(frame, center, 3, (0, 0, 255), -1)
         return center
 
 def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
@@ -151,7 +158,7 @@ def fill_holes(depth_frame):
     depth_frame = hole_filling.process(depth_frame)
     return depth_frame
 
-def find_target_size(contour,color_image):
+def find_contour_aspect_ratio(contour,color_image):
     
     box= cv2.minAreaRect(contour)
     points = cv2.boxPoints(box)
@@ -172,16 +179,16 @@ def find_contour_length(contour, distance):
 
     # Assuming that the distance of the center pixel is the same as the pixels of the contour:
     # Get actual perimeter of contour based on angle per pixel in the x direction
-    rad_per_pix_x = math.radians(constants.FoV_angle_deg_x)/constants.FoV_width_pix_x
-    real_dist_pix_x = distance * math.sin(rad_per_pix_x)
-    real_length_x = real_dist_pix_x * contour_length
+    # rad_per_pix_x = math.radians(constants.FoV_angle_deg_x)/constants.FoV_width_pix_x
+    # real_dist_pix_x = distance * math.sin(rad_per_pix_x)
+    # real_length_x = real_dist_pix_x * contour_length
 
     # Same as above, but using y direction
     rad_per_pix_y = math.radians(constants.FoV_angle_deg_y)/constants.FoV_width_pix_y
     real_dist_pix_y = distance * math.sin(rad_per_pix_y)
     real_length_y = real_dist_pix_y * contour_length
 
-    return real_length_x*100, real_length_y*100
+    return real_length_y*100
 
 def find_and_push_closest(nt, object_type, object_x, object_y, object_z):
     if len(object_z) == 0:
@@ -205,3 +212,14 @@ def logStuff(listToLog):
     with open("/home/crr/2023Visions/Detector/log.csv", "a+", newline="") as log:
         c = csv.writer(log)
         c.writerow(listToLog)
+
+def show_image(window_name,img_to_show):
+    cv2.namedWindow("window_name", cv2.WINDOW_NORMAL)
+    cv2.imshow("window_name", img_to_show)
+
+def format_num(num):
+    formatted_num = "{:.1f}".format(num)
+    return formatted_num  #returns a string
+
+def putText(img,text,position,color):
+    cv2.putText(img, text,position, cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
