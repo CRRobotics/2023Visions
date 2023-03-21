@@ -132,9 +132,9 @@ while True:
 
 
     if not "-h" in sys.argv:
-        color_image= cv2.rotate(color_image,cv2.ROTATE_90_COUNTERCLOCKWISE)
+        color_image_rotate= cv2.rotate(color_image,cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-        f.show_image("color_image",color_image)
+        f.show_image("color_image",color_image_rotate)
     key = cv2.waitKey(1)
     if key & 0xFF == ord('q') or key == 27:
         cv2.destroyAllWindows()
