@@ -214,8 +214,8 @@ def logStuff(listToLog):
         c.writerow(listToLog)
 
 def show_image(window_name,img_to_show):
-    cv2.namedWindow("window_name", cv2.WINDOW_NORMAL)
-    cv2.imshow("window_name", img_to_show)
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.imshow(window_namey, img_to_show)
 
 def format_num(num):
     formatted_num = "{:.1f}".format(num)
