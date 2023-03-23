@@ -15,8 +15,8 @@ class cconfig:
     fr: int         # framerate
     
 
-colorcfg = cconfig(width = 1280, height = 720, fr = 10)
-depthcfg = cconfig(width = 848, height = 480, fr = 10)
+colorcfg = cconfig(width = 1280, height = 720, fr = 30)
+depthcfg = cconfig(width = 848, height = 480, fr = 30)
 pipeline = rs.pipeline()
 config = rs.config()
 config.enable_stream(rs.stream.depth, depthcfg.width, depthcfg.height, rs.format.z16, depthcfg.fr)
