@@ -82,16 +82,16 @@ while True:
                     if dz1 != 0:
                         cube_perimeter= f.find_contour_length(contour1, dz1)
                         if cube_perimeter >= constants.cube_min_parameter and cube_perimeter <= constants.cube_max_parameter:
-                            cv2.drawContours(color_image,[contour1],0,(0,255,0),6)
-                            cv2.circle(color_image, center1, 3, (0, 0, 255), -1)
+                            # cv2.drawContours(color_image,[contour1],0,(0,255,0),6)
+                            # cv2.circle(color_image, center1, 3, (0, 0, 255), -1)
                             x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
                             cubeX.append(x1)
                             cubeY.append(y1)
                             cubeZ.append(z1)
-                            x1_visualize = f.format_num(x1*100)
-                            z1_visualize = f.format_num(z1_visualize*100)
-                            f.putText(color_image,x1_visualize,(point_x1,point_y1+5),(0,0,255))
-                            f.putText(color_image,z1_visualize,(point_x1,point_y1-5),(255,0,0))
+                            # x1_visualize = f.format_num(x1*100)
+                            # z1_visualize = f.format_num(z1_visualize*100)
+                            # f.putText(color_image,x1_visualize,(point_x1,point_y1+5),(0,0,255))
+                            # f.putText(color_image,z1_visualize,(point_x1,point_y1-5),(255,0,0))
     f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
 
     
@@ -116,16 +116,16 @@ while True:
                     if dz2 != 0:
                         cone_perimeter = f.find_contour_length(contour2, dz2)
                         if cone_perimeter >=constants.cone_min_parameter and cone_perimeter <= constants.cone_max_parameter:
-                            cv2.drawContours(color_image,[contour2],0,(0,255,0),6)
-                            cv2.circle(color_image, center2, 3, (0, 0, 255), -1)
+                            # cv2.drawContours(color_image,[contour2],0,(0,255,0),6)
+                            # cv2.circle(color_image, center2, 3, (0, 0, 255), -1)
                             x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
                             coneX.append(x2)
                             coneY.append(y2)
                             coneZ.append(z2)
-                            x2_visualize = f.format_num(x2*100)
-                            z2_visualize = f.format_num(z2_visualize*100)
-                            f.putText(color_image,x2_visualize,(point_x2,point_y2+5),(0,0,255))
-                            f.putText(color_image,z2_visualize,(point_x2,point_y2-5),(255,0,0))
+                            # x2_visualize = f.format_num(x2*100)
+                            # z2_visualize = f.format_num(z2_visualize*100)
+                            # f.putText(color_image,x2_visualize,(point_x2,point_y2+5),(0,0,255))
+                            # f.putText(color_image,z2_visualize,(point_x2,point_y2-5),(255,0,0))
     f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
 
