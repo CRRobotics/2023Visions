@@ -97,7 +97,8 @@ def find_contour_center(contour):
     if moments['m00'] !=0:
         center=((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
         return center
-
+    else:
+        return (0,0)
 def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
     intrinsics = rs.video_stream_profile(color_frame.profile).get_intrinsics()
     
