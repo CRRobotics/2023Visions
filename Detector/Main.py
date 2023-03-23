@@ -44,7 +44,7 @@ align_to = rs.stream.color
 align = rs.align(align_to)
 
 #UNCOMMENT THIS FOR NETWORKTABLES
-# nt =f.networkConnect()
+nt =f.networkConnect()
 
 
 while True:
@@ -92,7 +92,7 @@ while True:
                             z1_visualize = f.format_num(z1_visualize*100)
                             f.putText(color_image,x1_visualize,(point_x1,point_y1+5),(0,0,255))
                             f.putText(color_image,z1_visualize,(point_x1,point_y1-5),(255,0,0))
-    # f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
+    f.find_and_push_closest(nt, "Cube", cubeX, cubeY, cubeZ)
 
     
     '''
@@ -126,7 +126,7 @@ while True:
                             z2_visualize = f.format_num(z2_visualize*100)
                             f.putText(color_image,x2_visualize,(point_x2,point_y2+5),(0,0,255))
                             f.putText(color_image,z2_visualize,(point_x2,point_y2-5),(255,0,0))
-    # f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
+    f.find_and_push_closest(nt, "Cone", coneX, coneY, coneZ)
 
 
 
