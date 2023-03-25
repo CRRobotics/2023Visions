@@ -110,9 +110,9 @@ def getCordinatesOfTarget_Cam(x, y, depth_frame, color_frame):
 
     #from camera perspective, dx points right, dy points down, dz points forward
 
-    return dy,dx,dz               # for vertical mount usb port pointing up
+    # return dy,dx,dz               # for vertical mount usb port pointing up
     # return -dy, -dx, dz         # for vertical mount usb port pointing down
-    # return dx,-dy,dz            # for horizontal mount, screw pointing down
+    return dx,-dy,dz            # for horizontal mount, screw pointing down
     # return -dx,dy,dz            # for horizontal mount, screw pointing up
 def correct_coordinate(input_coordinate):
     input_coordinate*=100
