@@ -25,3 +25,9 @@ cone_max_parameter=105
 
 cube_min_parameter = 60
 cube_max_parameter = 85
+
+#Use sliders.py to adjust these values based on lighting
+cube_low = 20
+cube_high = 255
+cone_low = 80
+cone_high = 255
