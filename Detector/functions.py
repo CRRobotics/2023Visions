@@ -74,10 +74,14 @@ def have_countours(contours):
         return True
     return False
 
+
 def findContours(mask):
     contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    contours=[cv2.convexHull(contour) for contour in contours]
-    return contours
+    convex_hull=[cv2.convexHull(contour) for contour in contours]
+
+   
+  
+    return convex_hull, contours
 
 def if_contour_big_enough(contour):
     if cv2.contourArea(contour) >= 1600:
