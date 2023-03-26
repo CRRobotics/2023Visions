@@ -68,10 +68,14 @@ while True:
     cubeY=[]
     cubeZ=[]
     mask1 = f.maskGenerator1(color_image)
-    contours1=f.findContours(mask1)
+    contours1,nonconvexs1=f.findContours(mask1)
     has_contours_cube = f.have_countours(contours1)
     if has_contours_cube:
-        for contour1 in contours1:
+        for i in range(len(contours1)):
+            contour1 = contours1[i]
+            nonconvex1 = nonconvexs1[i]
+            solidity1 = cv2.contourArea(nonconvex1)/cv2.contourArea(contour1)*100 if cv2.contourArea(contour1) > 0 else -1
+            if solidity1 < constants.cube_solidity_thresh: continue
             contour1_big_enough = f.if_contour_big_enough(contour1)
             if contour1_big_enough:
                 cube_ratio = f.find_contour_aspect_ratio(contour1,color_image)
