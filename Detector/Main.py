@@ -106,10 +106,14 @@ while True:
     coneY=[]
     coneZ=[]
     mask2=f.maskGenerator2(color_image,constants.lower_yellow,constants.higher_yellow)
-    contours2=f.findContours(mask2)
+    contours2,nonconvexs2=f.findContours(mask2)
     has_contours_cone = f.have_countours(contours2)
     if has_contours_cone:
-        for contour2 in contours2:
+        for i in range(len(contours2)):
+            contour2 = contours2[i]
+            nonconvex2 = nonconvexs2[i]
+            solidity_cone = cv2.contourArea(nonconvex2)/cv2.contourArea(contour2)*100 if cv2.contourArea(contour2) > 0 else -1
+            if solidity_cone < constants.cone_solidity_thresh: continue
             contour2_big_enough = f.if_contour_big_enough(contour2)
             if contour2_big_enough:
                 cone_ratio = f.find_contour_aspect_ratio(contour2,color_image)
