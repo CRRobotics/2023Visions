@@ -31,3 +31,6 @@ cube_low = 20
 cube_high = 255
 cone_low = 80
 cone_high = 255
+
+cube_solidity_thresh = 80
+cone_solidity_thresh = 60
