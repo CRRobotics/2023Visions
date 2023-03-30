@@ -27,8 +27,8 @@ cube_min_parameter = 60
 cube_max_parameter = 85
 
 #Use sliders.py to adjust these values based on lighting
-cube_low = 20
-cube_high = 255
+cube_low = 58
+cube_high = 210
 cone_low = 80
 cone_high = 255
 
