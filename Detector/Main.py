@@ -88,7 +88,10 @@ while True:
                         if cube_perimeter >= constants.cube_min_parameter and cube_perimeter <= constants.cube_max_parameter:
                             # cv2.drawContours(color_image,[contour1],0,(0,255,0),6)
                             # cv2.circle(color_image, center1, 3, (0, 0, 255), -1)
-                            x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
+                            # x1,y1,z1=f.getCordinatesOfTarget_Bot(dx1,dy1,dz1,constants.cam_mount_angle, constants.cam_height)
+                            x1 = dx1
+                            y1 = dy1
+                            z1 = dz1
                             cubeX.append(x1)
                             cubeY.append(y1)
                             cubeZ.append(z1)
@@ -126,7 +129,10 @@ while True:
                         if cone_perimeter >=constants.cone_min_parameter and cone_perimeter <= constants.cone_max_parameter:
                             # cv2.drawContours(color_image,[contour2],0,(0,255,0),6)
                             # cv2.circle(color_image, center2, 3, (0, 0, 255), -1)
-                            x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
+                            # x2,y2,z2=f.getCordinatesOfTarget_Bot(dx2,dy2,dz2,constants.cam_mount_angle, constants.cam_height)
+                            x2 = dx2
+                            y2 = dy2 
+                            z2 = dz2
                             coneX.append(x2)
                             coneY.append(y2)
                             coneZ.append(z2)
